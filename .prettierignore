@@ -1,0 +1,10 @@
+node_modules/
+.expo/
+dist/
+coverage/
+package-lock.json
+assets/
+# Documents produit — ne pas reformater automatiquement
+docs-source/
+CLAUDE.md
+cahier-des-charges-app-jeune.md

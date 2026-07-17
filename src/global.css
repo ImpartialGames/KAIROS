@@ -1,0 +1,36 @@
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css';
+
+/*
+ * Tokens de design — miroir exact de src/theme/tokens.ts (source de vérité).
+ * Le test src/theme/__tests__/tokens-sync.test.ts vérifie la synchronisation.
+ * Les écrans consomment ces tokens via les classes : bg-background, text-content,
+ * text-accent, font-serif, font-sans-bold, etc. Jamais de couleur en dur.
+ */
+@layer theme {
+  @theme {
+    /* Couleurs sémantiques */
+    --color-background: #0d0b08;
+    --color-surface: #1a1712;
+    --color-surface-raised: #241f18;
+    --color-border: #3a3226;
+    --color-content: #f2ead9;
+    --color-content-muted: #b9af9c;
+    --color-content-faint: #7e7666;
+    --color-accent: #c87b3f;
+    --color-accent-bright: #e39a56;
+    --color-accent-deep: #9a5a28;
+    --color-cold: #97a6ac;
+    --color-danger: #c25a4a;
+    --color-success: #97a05f;
+
+    /* Typographie — noms exacts des polices chargées par expo-font */
+    --font-serif: Lora_400Regular;
+    --font-serif-medium: Lora_500Medium;
+    --font-serif-semibold: Lora_600SemiBold;
+    --font-sans: SpaceGrotesk_400Regular;
+    --font-sans-medium: SpaceGrotesk_500Medium;
+    --font-sans-bold: SpaceGrotesk_700Bold;
+  }
+}
