@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native builds (prebuild output — regenerated, non committé tant que non customisé)
+ios/
+android/
+
+# Environnement — jamais committer de clés (voir CLAUDE.md)
+.env.local
+.env*.local
+
+# Metro
+.metro-health-check*
+
+# Debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Tests
+coverage/
+
+# macOS
+.DS_Store
+*.pem
+
+# TypeScript
+*.tsbuildinfo
