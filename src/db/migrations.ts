@@ -68,9 +68,12 @@ export async function migrate(db: DbClient): Promise<void> {
   const current = row?.user_version ?? 0;
 
   for (let version = current; version < MIGRATIONS.length; version++) {
+    // DDL + bump de version dans la MÊME transaction : un crash entre les deux
+    // laisserait sinon user_version en arrière et rejouerait la migration (les
+    // CREATE TABLE sans IF NOT EXISTS échoueraient, bloquant le bootstrap).
     await db.withTransactionAsync(async () => {
       await db.execAsync(MIGRATIONS[version] as string);
+      await db.execAsync(`PRAGMA user_version = ${version + 1}`);
     });
-    await db.execAsync(`PRAGMA user_version = ${version + 1}`);
   }
 }

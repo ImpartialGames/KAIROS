@@ -119,7 +119,9 @@ export function createFastingStore({
       }
       const { repositories } = requireApp();
 
-      const endedAt = now();
+      // Jamais avant le début : une horloge qui recule (correction NTP) ne doit
+      // pas produire endedAt < startedAt — la session serait invalide (cf. Zod).
+      const endedAt = Math.max(now(), activeSession.startedAt);
       // Les paliers franchis d'ici la fin comptent (ex. terminer à 16h30 → 16h enregistré).
       await get().syncMilestones(endedAt);
       await repositories.fastSessions.complete(activeSession.id, endedAt);
@@ -134,7 +136,8 @@ export function createFastingStore({
       }
       const { repositories } = requireApp();
 
-      await repositories.fastSessions.cancel(activeSession.id, now());
+      const endedAt = Math.max(now(), activeSession.startedAt);
+      await repositories.fastSessions.cancel(activeSession.id, endedAt);
       await notifications.cancelMilestones(activeSession);
       set({ activeSession: null, reachedHours: [] });
     },

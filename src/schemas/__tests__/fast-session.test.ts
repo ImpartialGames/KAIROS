@@ -43,6 +43,11 @@ describe('FastSessionSchema', () => {
     expect(FastSessionSchema.safeParse(custom).success).toBe(true);
   });
 
+  it('accepte une session de durée nulle (endedAt === startedAt, horloge recalée)', () => {
+    const zeroDuration = { ...completed(), endedAt: START };
+    expect(FastSessionSchema.safeParse(zeroDuration).success).toBe(true);
+  });
+
   it.each([
     ['id non uuid', { id: 'x' }],
     ['userId non uuid', { userId: 'x' }],
@@ -62,7 +67,6 @@ describe('FastSessionSchema', () => {
 
   it.each([
     ['endedAt antérieur à startedAt', { endedAt: START - 1 }],
-    ['endedAt égal à startedAt', { endedAt: START }],
     ['endedAt manquant sur une session terminée', { endedAt: null }],
   ])('rejette (completed) : %s', (_label, override) => {
     expect(FastSessionSchema.safeParse({ ...completed(), ...override }).success).toBe(false);

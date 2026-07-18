@@ -32,8 +32,10 @@ const fastSessionShape = z.object({
 });
 
 export const FastSessionSchema = fastSessionShape
-  .refine((s) => s.endedAt === null || s.endedAt > s.startedAt, {
-    message: 'endedAt doit être postérieur à startedAt',
+  // >= et non > : une session de durée nulle (horloge recalée à la clôture) reste
+  // valide ; elle ne doit jamais précéder son début.
+  .refine((s) => s.endedAt === null || s.endedAt >= s.startedAt, {
+    message: 'endedAt ne peut pas précéder startedAt',
     path: ['endedAt'],
   })
   .refine((s) => (s.status === 'running' ? s.endedAt === null : s.endedAt !== null), {

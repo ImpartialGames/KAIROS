@@ -164,6 +164,27 @@ describe('fasting-store (intégration)', () => {
     expect(cancelled?.status).toBe('cancelled');
   });
 
+  it('clôture avec une horloge qui a reculé sous le début : session valide, pas d’empoisonnement', async () => {
+    await appStore.getState().acknowledgePrecautions();
+    const store = newFastingStore();
+    await store.getState().startFast({ protocol: '16:8' });
+    const session = store.getState().activeSession!;
+
+    // Correction NTP : l'horloge recule sous le début du jeûne.
+    clock.now = session.startedAt - HOUR_MS;
+    await expect(store.getState().completeFast()).resolves.toBeUndefined();
+
+    // endedAt borné au début (durée nulle) → session valide, store bien vidé.
+    expect(store.getState().activeSession).toBeNull();
+    const repos = appStore.getState().repositories!;
+    const completed = await repos.fastSessions.getById(session.id);
+    expect(completed?.status).toBe('completed');
+    expect(completed?.endedAt).toBe(session.startedAt);
+
+    // La liste ne plante pas : aucune ligne empoisonnée qui ferait échouer tout list().
+    await expect(repos.fastSessions.list(session.userId)).resolves.toHaveLength(1);
+  });
+
   it('complete/cancel sans session en cours échouent explicitement', async () => {
     const store = newFastingStore();
     await expect(store.getState().completeFast()).rejects.toThrow(NO_ACTIVE_SESSION_ERROR);
