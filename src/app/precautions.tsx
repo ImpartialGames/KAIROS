@@ -1,15 +1,31 @@
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AmbientBackground } from '@/components/ui/ambient-background';
+import { GlassCard } from '@/components/ui/glass-card';
+import { PressableScale } from '@/components/ui/pressable-scale';
 import { useAppStore } from '@/stores/app-store';
-import { Pressable, ScrollView, Text, View } from '@/tw';
+import { colors } from '@/theme/tokens';
+import { ScrollView, Text, View } from '@/tw';
 
 interface PrecautionSection {
   title: string;
   items: string[];
 }
+
+const ctaGlow = {
+  shadowColor: colors.accent,
+  shadowOpacity: 0.5,
+  shadowRadius: 16,
+  shadowOffset: { width: 0, height: 0 },
+  elevation: 6,
+} as const;
 
 /**
  * Précautions et contre-indications (source : docs-source/biochimie-approfondie.md,
@@ -38,42 +54,72 @@ export default function PrecautionsScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
-      <View className="flex-1 bg-background">
+    <View className="flex-1 bg-background">
+      <AmbientBackground />
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
         <ScrollView className="flex-1" contentContainerClassName="gap-6 px-6 py-8">
-          <Text className="font-serif-semibold text-2xl text-content">{t('title')}</Text>
-          <Text className="font-serif text-base leading-6 text-content-muted">{t('intro')}</Text>
+          <View className="gap-2">
+            <Text className="font-serif-semibold text-3xl tracking-tight text-content">
+              {t('title')}
+            </Text>
+            <Text className="font-serif text-base leading-6 text-content-muted">{t('intro')}</Text>
+          </View>
 
           {sections.map((section) => (
-            <View
-              key={section.title}
-              className="gap-3 rounded-2xl border border-border bg-surface p-5"
-            >
-              <Text className="font-sans-medium text-sm uppercase tracking-[2px] text-accent">
+            <GlassCard key={section.title} contentClassName="gap-3 p-5">
+              <Text className="font-sans-medium text-xs uppercase tracking-[2px] text-accent">
                 {section.title}
               </Text>
               {section.items.map((item) => (
-                <Text key={item} className="font-serif text-base leading-6 text-content">
-                  {'•'} {item}
-                </Text>
+                <View key={item} className="flex-row gap-3">
+                  <View className="mt-2 h-1.5 w-1.5 rounded-full bg-accent" />
+                  <Text className="flex-1 font-serif text-base leading-6 text-content">{item}</Text>
+                </View>
               ))}
-            </View>
+            </GlassCard>
           ))}
 
           <Text className="font-serif text-sm leading-5 text-content-faint">{t('disclaimer')}</Text>
         </ScrollView>
 
-        <View className="border-t border-border px-6 py-4">
-          <Pressable
-            accessibilityRole="button"
-            disabled={saving}
+        {/* Barre d'action translucide — le contenu défile dessous (§12 apple-design). */}
+        <View className="px-6 pb-4 pt-3">
+          <BlurView
+            intensity={40}
+            tint="dark"
+            experimentalBlurMethod="dimezisBlurView"
+            style={StyleSheet.absoluteFill}
+          />
+          <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.topHairline]} />
+          <PressableScale
             onPress={onAcknowledge}
-            className="items-center rounded-2xl bg-accent px-6 py-4 active:bg-accent-deep disabled:opacity-60"
+            disabled={saving}
+            style={saving ? undefined : ctaGlow}
           >
-            <Text className="font-sans-bold text-base text-background">{t('acknowledge')}</Text>
-          </Pressable>
+            <View className="overflow-hidden rounded-2xl" style={{ opacity: saving ? 0.6 : 1 }}>
+              <LinearGradient
+                colors={[colors.accentBright, colors.accent]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <View className="flex-row items-center justify-center gap-3 px-6 py-4">
+                  <Text className="font-sans-bold text-base text-background">
+                    {t('acknowledge')}
+                  </Text>
+                  <Ionicons name="checkmark" size={18} color={colors.background} />
+                </View>
+              </LinearGradient>
+            </View>
+          </PressableScale>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  topHairline: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
+});

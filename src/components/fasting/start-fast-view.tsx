@@ -6,11 +6,13 @@ import { useTranslation } from 'react-i18next';
 import { Alert } from 'react-native';
 
 import { BrandLogo } from '@/components/brand/brand-logo';
+import { GlassCard } from '@/components/ui/glass-card';
+import { PressableScale } from '@/components/ui/pressable-scale';
 import { PROTOCOL_TARGET_HOURS, type FastingProtocol } from '@/schemas/fast-session';
 import { selectNeedsPrecautions, useAppStore } from '@/stores/app-store';
 import { fastingStore } from '@/stores/fasting-store';
 import { colors } from '@/theme/tokens';
-import { Pressable, Text, TextInput, View } from '@/tw';
+import { Text, TextInput, View } from '@/tw';
 
 const NAMED_PROTOCOLS = ['16:8', '18:6', '20:4', 'OMAD'] as const;
 const MIN_CUSTOM_HOURS = 1;
@@ -20,7 +22,7 @@ const FULL_DAY_HOURS = 24;
 const goldGlow = {
   shadowColor: colors.accent,
   shadowOpacity: 0.5,
-  shadowRadius: 14,
+  shadowRadius: 16,
   shadowOffset: { width: 0, height: 0 },
   elevation: 6,
 } as const;
@@ -33,7 +35,8 @@ function parseCustomHours(raw: string): number | null {
   return hours >= MIN_CUSTOM_HOURS && hours <= MAX_CUSTOM_HOURS ? hours : null;
 }
 
-/** Carte d'un protocole nommé (16:8…) — remplie en dégradé cuivre quand sélectionnée. */
+/** Carte d'un protocole nommé (16:8…) — dégradé cuivre lumineux si sélectionnée,
+ *  verre sombre sinon ; enfoncement au toucher. */
 function ProtocolCard({
   label,
   selected,
@@ -44,12 +47,7 @@ function ProtocolCard({
   onPress: () => void;
 }) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      className="flex-1"
-    >
+    <PressableScale style={{ flex: 1 }} onPress={onPress} accessibilityState={{ selected }}>
       {selected ? (
         <View style={goldGlow} className="overflow-hidden rounded-2xl">
           <LinearGradient
@@ -58,18 +56,20 @@ function ProtocolCard({
             end={{ x: 1, y: 1 }}
           >
             <View className="items-center gap-2 px-2 py-5">
-              <Text className="font-sans-bold text-lg text-background">{label}</Text>
+              <Text className="font-sans-bold text-lg tracking-tight text-background">{label}</Text>
               <View className="h-1 w-1 rounded-full bg-background" />
             </View>
           </LinearGradient>
         </View>
       ) : (
-        <View className="items-center gap-2 rounded-2xl border border-border bg-surface px-2 py-5">
-          <Text className="font-sans-medium text-lg text-content-muted">{label}</Text>
+        <GlassCard contentClassName="items-center gap-2 px-2 py-5">
+          <Text className="font-sans-medium text-lg tracking-tight text-content-muted">
+            {label}
+          </Text>
           <View className="h-1 w-1 rounded-full bg-transparent" />
-        </View>
+        </GlassCard>
       )}
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -116,7 +116,7 @@ export function StartFastView() {
       <BrandLogo />
 
       <View className="gap-4">
-        <Text className="text-center font-sans-medium text-sm uppercase tracking-[3px] text-accent">
+        <Text className="text-center font-sans-medium text-xs uppercase tracking-[3px] text-accent">
           {t('timer.chooseProtocol')}
         </Text>
 
@@ -131,30 +131,30 @@ export function StartFastView() {
           ))}
         </View>
 
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ selected: isCustom }}
+        <PressableScale
           onPress={() => setProtocol('custom')}
-          className={
-            isCustom
-              ? 'flex-row items-center gap-3 rounded-2xl border border-accent bg-surface px-4 py-4'
-              : 'flex-row items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-4'
-          }
+          accessibilityState={{ selected: isCustom }}
         >
-          <View className="h-9 w-9 items-center justify-center rounded-full bg-surface-raised">
-            <Ionicons name="options-outline" size={18} color={colors.accent} />
-          </View>
-          <Text
-            className={
-              isCustom
-                ? 'flex-1 font-sans-medium text-base text-accent'
-                : 'flex-1 font-sans-medium text-base text-content-muted'
-            }
-          >
-            {t('timer.protocols.custom')}
-          </Text>
-          <Ionicons name="chevron-forward" size={18} color={colors.contentFaint} />
-        </Pressable>
+          <GlassCard contentClassName="flex-row items-center gap-3 px-4 py-4">
+            <View className="h-9 w-9 items-center justify-center rounded-full bg-surface-raised">
+              <Ionicons name="options-outline" size={18} color={colors.accent} />
+            </View>
+            <Text
+              className={
+                isCustom
+                  ? 'flex-1 font-sans-medium text-base text-accent'
+                  : 'flex-1 font-sans-medium text-base text-content-muted'
+              }
+            >
+              {t('timer.protocols.custom')}
+            </Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={isCustom ? colors.accent : colors.contentFaint}
+            />
+          </GlassCard>
+        </PressableScale>
 
         {isCustom && (
           <TextInput
@@ -169,13 +169,13 @@ export function StartFastView() {
         )}
       </View>
 
-      <View className="gap-4 rounded-2xl border border-border bg-surface px-4 py-4">
+      <GlassCard elevated contentClassName="gap-4 p-4">
         <View className="flex-row items-center gap-4">
           <View className="h-11 w-11 items-center justify-center rounded-full bg-surface-raised">
             <Ionicons name="sunny-outline" size={20} color={colors.accent} />
           </View>
           <View className="flex-1">
-            <Text className="font-sans-medium text-lg text-content">
+            <Text className="font-sans-medium text-xl tracking-tight text-content">
               {fastingHours !== null
                 ? t('timer.protocolHours', { hours: fastingHours })
                 : t('timer.customHoursLabel')}
@@ -188,29 +188,28 @@ export function StartFastView() {
           </View>
         </View>
         <View className="h-px self-stretch bg-border" />
-      </View>
+      </GlassCard>
 
-      <Pressable
-        accessibilityRole="button"
-        disabled={!canStart || starting}
+      <PressableScale
         onPress={onStart}
-        style={canStart ? goldGlow : undefined}
-        className="overflow-hidden rounded-2xl"
+        disabled={!canStart || starting}
+        style={[{ alignSelf: 'stretch' }, canStart ? goldGlow : undefined]}
       >
-        <LinearGradient
-          colors={[colors.accentBright, colors.accent]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={{ opacity: canStart ? 1 : 0.5 }}
-        >
-          <View className="flex-row items-center justify-center gap-3 px-6 py-4">
-            <Text className="font-sans-bold text-base uppercase tracking-[1px] text-background">
-              {t('timer.start')}
-            </Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.background} />
-          </View>
-        </LinearGradient>
-      </Pressable>
+        <View className="overflow-hidden rounded-2xl" style={{ opacity: canStart ? 1 : 0.5 }}>
+          <LinearGradient
+            colors={[colors.accentBright, colors.accent]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <View className="flex-row items-center justify-center gap-3 px-6 py-4">
+              <Text className="font-sans-bold text-base uppercase tracking-[1px] text-background">
+                {t('timer.start')}
+              </Text>
+              <Ionicons name="arrow-forward" size={18} color={colors.background} />
+            </View>
+          </LinearGradient>
+        </View>
+      </PressableScale>
 
       <View className="flex-row items-center justify-center gap-2">
         <Ionicons name="shield-checkmark-outline" size={14} color={colors.contentFaint} />
