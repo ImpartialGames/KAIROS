@@ -3,6 +3,10 @@ jest.mock('expo-localization', () => ({
   getLocales: () => [{ languageCode: 'fr' }],
 }));
 
+jest.mock('expo-crypto', () => ({
+  randomUUID: () => require('node:crypto').randomUUID(),
+}));
+
 jest.mock(
   'react-native-safe-area-context',
   () =>
