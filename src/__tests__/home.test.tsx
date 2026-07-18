@@ -30,13 +30,21 @@ describe('HomeScreen — pas de session en cours', () => {
     fastingStore.setState({ activeSession: null, reachedHours: [], hydrated: true });
   });
 
-  it('rend l’identité produit et le choix de protocole via i18n', () => {
+  it('rend le logo de marque, le choix de protocole et la devise via i18n', () => {
     render(<HomeScreen />);
 
-    expect(screen.getByText('KAIROS')).toBeOnTheScreen();
-    expect(screen.getByText('Le moment juste.')).toBeOnTheScreen();
+    expect(screen.getByTestId('brand-logo')).toBeOnTheScreen();
     expect(screen.getByText('Choisissez votre protocole')).toBeOnTheScreen();
     expect(screen.getByText('OMAD')).toBeOnTheScreen();
+    expect(screen.getByText('Science. Clarté. Discipline.')).toBeOnTheScreen();
+  });
+
+  it('affiche la fenêtre d’alimentation dérivée du protocole', () => {
+    render(<HomeScreen />);
+
+    // 16:8 sélectionné par défaut → 16 h de jeûne / 8 h d'alimentation.
+    expect(screen.getByText('16 h de jeûne')).toBeOnTheScreen();
+    expect(screen.getByText("8 h d'alimentation")).toBeOnTheScreen();
   });
 
   it('route vers les précautions au tout premier démarrage de jeûne', () => {
