@@ -1,12 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AmbientBackground } from '@/components/ui/ambient-background';
 import { GlassCard } from '@/components/ui/glass-card';
-import { PressableScale } from '@/components/ui/pressable-scale';
 import { timeline } from '@/content';
 import type { TimelinePhase } from '@/content/schema';
 import { elapsedMs, formatHms } from '@/domain/fasting';
@@ -129,7 +127,6 @@ function PhaseCard({ phase, status }: { phase: TimelinePhase; status: PhaseStatu
 /** Timeline biochimique — les 9 paliers, liés en direct à la session en cours. */
 export default function TimelineScreen() {
   const { t } = useTranslation('timeline');
-  const router = useRouter();
   const activeSession = useFastingStore((state) => state.activeSession);
   const [now, setNow] = useState(() => Date.now());
 
@@ -149,13 +146,8 @@ export default function TimelineScreen() {
   return (
     <View className="flex-1 bg-background">
       <AmbientBackground />
-      <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
-        <View className="flex-row items-center gap-3 px-6 pb-2 pt-2">
-          <PressableScale onPress={() => router.back()} accessibilityLabel={t('link')}>
-            <View className="h-10 w-10 items-center justify-center rounded-full border border-border bg-surface">
-              <Ionicons name="chevron-back" size={20} color={colors.content} />
-            </View>
-          </PressableScale>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
+        <View className="px-6 pb-2 pt-2">
           <Text className="font-serif-semibold text-2xl tracking-tight text-content">
             {t('title')}
           </Text>

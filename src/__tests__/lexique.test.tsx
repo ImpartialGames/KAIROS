@@ -5,11 +5,6 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import LexiconScreen from '@/app/lexique';
 
-const mockBack = jest.fn();
-jest.mock('expo-router', () => ({
-  useRouter: () => ({ back: mockBack }),
-}));
-
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -43,11 +38,5 @@ describe('LexiconScreen', () => {
     fireEvent.changeText(screen.getByLabelText('Rechercher un terme…'), 'zzzzz');
 
     expect(screen.getByText(/Aucun terme ne correspond/)).toBeOnTheScreen();
-  });
-
-  it('revient en arrière via le bouton retour', () => {
-    render(<LexiconScreen />);
-    fireEvent.press(screen.getByLabelText('Lexique'));
-    expect(mockBack).toHaveBeenCalled();
   });
 });

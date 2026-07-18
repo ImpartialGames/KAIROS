@@ -12,8 +12,11 @@ import { Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BootstrapError } from '@/components/app/bootstrap-error';
+import { GlassTabBar } from '@/components/app/glass-tab-bar';
 import { initFastingNotifications } from '@/notifications/fasting-notifications';
 import { appStore, useAppStore } from '@/stores/app-store';
 import { fastingStore } from '@/stores/fasting-store';
@@ -64,24 +67,32 @@ export default function RootLayout() {
   // Échec d'ouverture de la base : message clair + réessayer (pas d'UI muette).
   if (appStatus === 'error') {
     return (
-      <>
+      <SafeAreaProvider>
         <StatusBar style="light" />
         <BootstrapError onRetry={() => void appStore.getState().bootstrap()} />
-      </>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <ThemeProvider value={kairosNavigationTheme}>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen name="precautions" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider value={kairosNavigationTheme}>
+        <StatusBar style="light" />
+        {/* Stack en haut, barre d'onglets en bas : frères de flex, aucun recouvrement. */}
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+          <View style={{ flex: 1 }}>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: colors.background },
+              }}
+            >
+              <Stack.Screen name="precautions" options={{ presentation: 'modal' }} />
+            </Stack>
+          </View>
+          <GlassTabBar />
+        </View>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

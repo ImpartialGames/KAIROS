@@ -7,6 +7,7 @@ import frErrors from '@/i18n/locales/fr/errors.json';
 import frJournal from '@/i18n/locales/fr/journal.json';
 import frLexicon from '@/i18n/locales/fr/lexicon.json';
 import frPrecautions from '@/i18n/locales/fr/precautions.json';
+import frTabs from '@/i18n/locales/fr/tabs.json';
 import frTimeline from '@/i18n/locales/fr/timeline.json';
 
 /**
@@ -23,6 +24,7 @@ export const resources = {
     lexicon: frLexicon,
     journal: frJournal,
     errors: frErrors,
+    tabs: frTabs,
   },
 } as const;
 

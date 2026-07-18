@@ -1,17 +1,12 @@
 // Dans l'app, _layout.tsx initialise i18n avant de rendre les écrans — même contrat ici.
 import '@/i18n';
 
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 
 import TimelineScreen from '@/app/timeline';
 import { HOUR_MS } from '@/domain/fasting';
 import type { FastSession } from '@/schemas/fast-session';
 import { fastingStore } from '@/stores/fasting-store';
-
-const mockBack = jest.fn();
-jest.mock('expo-router', () => ({
-  useRouter: () => ({ back: mockBack }),
-}));
 
 const NOW = 1_700_100_000_000;
 
@@ -44,12 +39,6 @@ describe('TimelineScreen — mode éducatif (aucune session)', () => {
     // Aucun libellé d'état en mode éducatif.
     expect(screen.queryByText('En cours')).not.toBeOnTheScreen();
     expect(screen.queryByText('Atteint')).not.toBeOnTheScreen();
-  });
-
-  it('revient en arrière via le bouton retour', () => {
-    render(<TimelineScreen />);
-    fireEvent.press(screen.getByLabelText('Timeline'));
-    expect(mockBack).toHaveBeenCalled();
   });
 });
 

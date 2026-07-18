@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -156,7 +155,6 @@ function EntryCard({ entry }: { entry: JournalEntry }) {
 /** Journal — nouvelle note (humeur + texte) et fil des jeûnes et ressentis sur 30 j. */
 export default function JournalScreen() {
   const { t } = useTranslation('journal');
-  const router = useRouter();
   const entries = useJournalStore((state) => state.entries);
   const sessions = useJournalStore((state) => state.sessions);
   const phasesBySession = useJournalStore((state) => state.phasesBySession);
@@ -195,13 +193,8 @@ export default function JournalScreen() {
   return (
     <View className="flex-1 bg-background">
       <AmbientBackground />
-      <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
-        <View className="flex-row items-center gap-3 px-6 pb-2 pt-2">
-          <PressableScale onPress={() => router.back()} accessibilityLabel={t('link')}>
-            <View className="h-10 w-10 items-center justify-center rounded-full border border-border bg-surface">
-              <Ionicons name="chevron-back" size={20} color={colors.content} />
-            </View>
-          </PressableScale>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
+        <View className="px-6 pb-2 pt-2">
           <Text className="font-serif-semibold text-2xl tracking-tight text-content">
             {t('title')}
           </Text>

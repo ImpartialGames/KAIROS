@@ -1,12 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AmbientBackground } from '@/components/ui/ambient-background';
 import { GlassCard } from '@/components/ui/glass-card';
-import { PressableScale } from '@/components/ui/pressable-scale';
 import { lexicon, synergies } from '@/content';
 import type { LexiconEntry, Synergy } from '@/content/schema';
 import { filterLexicon } from '@/domain/lexicon-search';
@@ -64,7 +62,6 @@ function SynergyCard({ synergy }: { synergy: Synergy }) {
 /** Lexique scientifique — 12 entrées cherchables + synergies entre mécanismes. */
 export default function LexiconScreen() {
   const { t } = useTranslation('lexicon');
-  const router = useRouter();
   const [query, setQuery] = useState('');
 
   const results = useMemo(() => filterLexicon(lexicon, query), [query]);
@@ -73,13 +70,8 @@ export default function LexiconScreen() {
   return (
     <View className="flex-1 bg-background">
       <AmbientBackground />
-      <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
-        <View className="flex-row items-center gap-3 px-6 pb-2 pt-2">
-          <PressableScale onPress={() => router.back()} accessibilityLabel={t('link')}>
-            <View className="h-10 w-10 items-center justify-center rounded-full border border-border bg-surface">
-              <Ionicons name="chevron-back" size={20} color={colors.content} />
-            </View>
-          </PressableScale>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
+        <View className="px-6 pb-2 pt-2">
           <Text className="font-serif-semibold text-2xl tracking-tight text-content">
             {t('title')}
           </Text>

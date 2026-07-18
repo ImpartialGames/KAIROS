@@ -32,7 +32,7 @@ export function GlassCard({
       <BlurView
         intensity={elevated ? 40 : 26}
         tint="dark"
-        experimentalBlurMethod="dimezisBlurView"
+        blurMethod="dimezisBlurView"
         style={StyleSheet.absoluteFill}
       />
       {/* Teinte chaude : donne le corps du verre par-dessus le flou. */}

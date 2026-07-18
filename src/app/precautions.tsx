@@ -87,7 +87,7 @@ export default function PrecautionsScreen() {
           <BlurView
             intensity={40}
             tint="dark"
-            experimentalBlurMethod="dimezisBlurView"
+            blurMethod="dimezisBlurView"
             style={StyleSheet.absoluteFill}
           />
           <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.topHairline]} />
