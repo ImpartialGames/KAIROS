@@ -3,6 +3,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import frCommon from '@/i18n/locales/fr/common.json';
+import frJournal from '@/i18n/locales/fr/journal.json';
 import frLexicon from '@/i18n/locales/fr/lexicon.json';
 import frPrecautions from '@/i18n/locales/fr/precautions.json';
 import frTimeline from '@/i18n/locales/fr/timeline.json';
@@ -14,7 +15,13 @@ import frTimeline from '@/i18n/locales/fr/timeline.json';
  * n'est pas encore tranché (cahier des charges §6).
  */
 export const resources = {
-  fr: { common: frCommon, precautions: frPrecautions, timeline: frTimeline, lexicon: frLexicon },
+  fr: {
+    common: frCommon,
+    precautions: frPrecautions,
+    timeline: frTimeline,
+    lexicon: frLexicon,
+    journal: frJournal,
+  },
 } as const;
 
 export const defaultNS = 'common';

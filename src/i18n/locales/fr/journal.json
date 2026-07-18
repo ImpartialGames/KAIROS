@@ -1,0 +1,16 @@
+{
+  "link": "Journal",
+  "title": "Journal",
+  "subtitle": "Vos jeûnes et vos ressentis, sur 30 jours.",
+  "newEntry": "Nouvelle note",
+  "moodLabel": "Comment vous sentez-vous ?",
+  "moodValue": "Humeur {{value}} sur 5",
+  "notePlaceholder": "Une note sur votre énergie, votre humeur, votre jeûne…",
+  "save": "Enregistrer",
+  "empty": "Votre journal est encore vide. Notez un ressenti, ou terminez un jeûne, pour commencer.",
+  "sessionCompleted": "Jeûne terminé",
+  "sessionCancelled": "Jeûne abandonné",
+  "duration": "{{hours}} h {{minutes}} min",
+  "phasesReached": "Paliers atteints",
+  "noteTitle": "Note"
+}

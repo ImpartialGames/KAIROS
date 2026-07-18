@@ -34,7 +34,7 @@ function NavPill({
 
 /** Écran principal : choix du protocole (logo + verre), ou session de jeûne en cours. */
 export default function HomeScreen() {
-  const { t } = useTranslation(['timeline', 'lexicon']);
+  const { t } = useTranslation(['timeline', 'lexicon', 'journal']);
   const router = useRouter();
   const activeSession = useFastingStore((state) => state.activeSession);
 
@@ -45,12 +45,17 @@ export default function HomeScreen() {
       <AmbientBackground />
       <SafeAreaView style={{ flex: 1 }}>
         {/* Accès permanent aux piliers pédagogiques (en jeûne comme au repos). */}
-        <View className="flex-row justify-end gap-2 px-6 pt-2">
+        <View className="flex-row flex-wrap justify-end gap-2 px-6 pt-2">
           <NavPill icon="pulse" label={t('link', { ns: 'timeline' })} onPress={go('/timeline')} />
           <NavPill
             icon="book-outline"
             label={t('link', { ns: 'lexicon' })}
             onPress={go('/lexique')}
+          />
+          <NavPill
+            icon="journal-outline"
+            label={t('link', { ns: 'journal' })}
+            onPress={go('/journal')}
           />
         </View>
 
