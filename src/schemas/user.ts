@@ -8,6 +8,11 @@ import { z } from 'zod';
 export const UserSchema = z.object({
   id: z.uuid(),
   isGuest: z.boolean(),
+  /**
+   * Moment où l'utilisateur a lu et accepté l'écran précautions/contre-indications
+   * (affiché une seule fois avant son tout premier jeûne). Null tant que non vu.
+   */
+  precautionsAcknowledgedAt: z.number().int().positive().nullable(),
   createdAt: z.number().int().positive(),
   updatedAt: z.number().int().positive(),
 });

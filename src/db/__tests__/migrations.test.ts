@@ -23,6 +23,39 @@ describe('migrations', () => {
     expect(row?.user_version).toBe(MIGRATIONS.length);
   });
 
+  it('migre une base v1 existante vers v2 sans perdre les données', async () => {
+    // Base "ancienne app" : uniquement la v1, avec un invité et une session.
+    const legacy = createNodeDbClient();
+    await legacy.execAsync(MIGRATIONS[0] as string);
+    await legacy.execAsync('PRAGMA user_version = 1');
+    await legacy.runAsync(
+      'INSERT INTO users (id, is_guest, created_at, updated_at) VALUES (?, 1, ?, ?)',
+      [UUID_A, NOW, NOW],
+    );
+    await legacy.runAsync(
+      `INSERT INTO fast_sessions (id, user_id, protocol, target_hours, status, started_at, ended_at, created_at, updated_at)
+       VALUES (?, ?, '16:8', 16, 'completed', ?, ?, ?, ?)`,
+      [UUID_B, UUID_A, NOW, NOW + 16 * 3_600_000, NOW, NOW],
+    );
+
+    await migrate(legacy);
+
+    const version = await legacy.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
+    expect(version?.user_version).toBe(MIGRATIONS.length);
+
+    const user = await legacy.getFirstAsync<{
+      id: string;
+      precautions_acknowledged_at: number | null;
+    }>('SELECT * FROM users WHERE id = ?', [UUID_A]);
+    expect(user?.id).toBe(UUID_A);
+    expect(user?.precautions_acknowledged_at).toBeNull();
+
+    const sessions = await legacy.getAllAsync('SELECT * FROM fast_sessions');
+    expect(sessions).toHaveLength(1);
+
+    legacy.close();
+  });
+
   it('crée les quatre tables du socle Phase 0', async () => {
     const tables = await db.getAllAsync<{ name: string }>(
       "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name",

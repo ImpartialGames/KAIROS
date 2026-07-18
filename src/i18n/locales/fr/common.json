@@ -2,9 +2,9 @@
   "appName": "KAIROS",
   "tagline": "Le moment juste.",
   "home": {
-    "scaffoldTitle": "Fondations posées",
-    "scaffoldBody": "Thème, i18n et navigation sont en place. Le timer arrive à l'étape 4, la timeline biochimique à l'étape 6.",
     "sampleCountdown": "16:00:00",
-    "sampleCountdownLabel": "Aperçu typographique du futur timer"
+    "sampleCountdownLabel": "Aperçu typographique du futur timer",
+    "startFast": "Commencer un jeûne",
+    "timerComingSoon": "Précautions acceptées — le timer arrive à l'étape 4."
   }
 }

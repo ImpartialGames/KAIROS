@@ -1,15 +1,27 @@
+import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Text, View } from '@/tw';
+import { selectNeedsPrecautions, useAppStore } from '@/stores/app-store';
+import { Pressable, Text, View } from '@/tw';
 
 /**
  * Écran d'accueil provisoire — remplacé par le timer à l'étape 4.
- * Sert de preuve de bout en bout : tokens du thème (classes NativeWind),
- * typographies serif/sans chargées, chaînes via i18next.
+ * Porte déjà le vrai point d'entrée du jeûne : au tout premier démarrage,
+ * l'écran précautions doit être lu et accepté avant tout.
  */
 export default function HomeScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
+  const needsPrecautions = useAppStore(selectNeedsPrecautions);
+
+  const onStartFast = () => {
+    if (needsPrecautions) {
+      router.push('/precautions');
+      return;
+    }
+    // Étape 4 : démarrage réel de la session via le store timer.
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -28,13 +40,19 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        <View className="items-center gap-2">
-          <Text className="font-serif-semibold text-xl text-content">
-            {t('home.scaffoldTitle')}
-          </Text>
-          <Text className="text-center font-serif text-base leading-6 text-content-muted">
-            {t('home.scaffoldBody')}
-          </Text>
+        <View className="items-center gap-3 self-stretch">
+          <Pressable
+            accessibilityRole="button"
+            onPress={onStartFast}
+            className="items-center self-stretch rounded-2xl bg-accent px-6 py-4 active:bg-accent-deep"
+          >
+            <Text className="font-sans-bold text-base text-background">{t('home.startFast')}</Text>
+          </Pressable>
+          {!needsPrecautions && (
+            <Text className="text-center font-sans text-xs text-content-faint">
+              {t('home.timerComingSoon')}
+            </Text>
+          )}
         </View>
       </View>
     </SafeAreaView>

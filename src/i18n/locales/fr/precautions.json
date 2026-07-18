@@ -1,0 +1,38 @@
+{
+  "title": "Avant votre premier jeûne",
+  "intro": "Le jeûne est un outil puissant, mais il ne convient pas à tout le monde ni à toutes les situations. Prenez une minute pour lire ce qui suit.",
+  "sections": [
+    {
+      "title": "Bonnes pratiques",
+      "items": [
+        "Démarrez progressivement : des jeûnes courts (12 à 16 heures) avant d'augmenter la durée.",
+        "L'hydratation est cruciale : eau, thé non sucré, bouillon.",
+        "À la rupture du jeûne, commencez par des aliments légers et augmentez progressivement."
+      ]
+    },
+    {
+      "title": "Supervision médicale recommandée",
+      "items": [
+        "Conditions médicales préexistantes",
+        "Prise de médicaments",
+        "Jeûnes prolongés",
+        "Diabète, en particulier"
+      ]
+    },
+    {
+      "title": "Contre-indications",
+      "items": [
+        "Grossesse et allaitement",
+        "Troubles du comportement alimentaire",
+        "Enfants et adolescents en croissance",
+        "Certaines conditions médicales spécifiques"
+      ]
+    },
+    {
+      "title": "Effets possibles pendant l'adaptation",
+      "items": ["Maux de tête", "Fatigue", "Irritabilité", "Difficultés de concentration"]
+    }
+  ],
+  "disclaimer": "Ces informations sont pédagogiques et ne remplacent pas un avis médical. En cas de doute, parlez-en à un professionnel de santé.",
+  "acknowledge": "J'ai lu et compris"
+}

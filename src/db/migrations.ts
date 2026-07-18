@@ -55,6 +55,12 @@ export const MIGRATIONS: readonly string[] = [
   CREATE INDEX idx_journal_entries_user_created
     ON journal_entries(user_id, created_at DESC);
   `,
+
+  // v2 — accusé de réception des précautions/contre-indications, affichées une
+  // seule fois avant le tout premier jeûne (source : biochimie-approfondie.md).
+  `
+  ALTER TABLE users ADD COLUMN precautions_acknowledged_at INTEGER;
+  `,
 ];
 
 export async function migrate(db: DbClient): Promise<void> {

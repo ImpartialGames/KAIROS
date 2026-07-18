@@ -9,4 +9,6 @@ export interface UserRepository {
   getOrCreateGuest(): Promise<User>;
   /** Utilisateur local courant, null avant le tout premier lancement. */
   getCurrent(): Promise<User | null>;
+  /** Enregistre l'acceptation de l'écran précautions (avant le premier jeûne). */
+  acknowledgePrecautions(userId: string, acknowledgedAt: number): Promise<User>;
 }

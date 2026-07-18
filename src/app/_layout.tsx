@@ -13,6 +13,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { appStore, useAppStore } from '@/stores/app-store';
 import { kairosNavigationTheme } from '@/theme/navigation';
 import { colors } from '@/theme/tokens';
 
@@ -28,13 +29,24 @@ export default function RootLayout() {
     SpaceGrotesk_700Bold,
   });
 
+  const appStatus = useAppStore((state) => state.status);
+
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    // Premier lancement : ouvre la base et crée/recharge l'invité (mode invité, CLAUDE.md).
+    void appStore.getState().bootstrap();
+  }, []);
+
+  const fontsReady = fontsLoaded || fontError !== null;
+  // 'error' laisse l'app se rendre : mieux vaut une UI dégradée qu'un splash infini.
+  const appReady = appStatus === 'ready' || appStatus === 'error';
+
+  useEffect(() => {
+    if (fontsReady && appReady) {
       void SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsReady, appReady]);
 
-  if (!fontsLoaded && !fontError) {
+  if (!fontsReady || !appReady) {
     return null;
   }
 
@@ -46,7 +58,9 @@ export default function RootLayout() {
           headerShown: false,
           contentStyle: { backgroundColor: colors.background },
         }}
-      />
+      >
+        <Stack.Screen name="precautions" options={{ presentation: 'modal' }} />
+      </Stack>
     </ThemeProvider>
   );
 }

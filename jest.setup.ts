@@ -7,6 +7,14 @@ jest.mock('expo-crypto', () => ({
   randomUUID: () => require('node:crypto').randomUUID(),
 }));
 
+// En test, la persistance passe par l'adaptateur node:sqlite (src/db/testing) —
+// toute ouverture de la base expo-sqlite est un bug de test, pas un fallback.
+jest.mock('expo-sqlite', () => ({
+  openDatabaseAsync: async () => {
+    throw new Error('expo-sqlite indisponible sous Jest — injecter createTestDb()');
+  },
+}));
+
 jest.mock(
   'react-native-safe-area-context',
   () =>
