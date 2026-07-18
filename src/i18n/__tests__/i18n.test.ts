@@ -7,7 +7,8 @@ describe('i18n', () => {
 
   it('sert les chaînes du namespace common', () => {
     expect(i18n.t('appName')).toBe('KAIROS');
-    expect(i18n.t('home.startFast')).toBe('Commencer un jeûne');
+    expect(i18n.t('timer.start')).toBe('Commencer un jeûne');
+    expect(i18n.t('timer.protocols.16:8')).toBe('16:8');
   });
 
   it('sert le namespace precautions (contenu santé critique)', () => {

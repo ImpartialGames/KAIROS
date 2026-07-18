@@ -13,7 +13,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { initFastingNotifications } from '@/notifications/fasting-notifications';
 import { appStore, useAppStore } from '@/stores/app-store';
+import { fastingStore } from '@/stores/fasting-store';
 import { kairosNavigationTheme } from '@/theme/navigation';
 import { colors } from '@/theme/tokens';
 
@@ -33,8 +35,16 @@ export default function RootLayout() {
 
   useEffect(() => {
     // Premier lancement : ouvre la base et crée/recharge l'invité (mode invité, CLAUDE.md).
+    initFastingNotifications();
     void appStore.getState().bootstrap();
   }, []);
+
+  useEffect(() => {
+    // Session en cours rechargée après le bootstrap (paliers manqués rattrapés).
+    if (appStatus === 'ready') {
+      void fastingStore.getState().hydrate();
+    }
+  }, [appStatus]);
 
   const fontsReady = fontsLoaded || fontError !== null;
   // 'error' laisse l'app se rendre : mieux vaut une UI dégradée qu'un splash infini.

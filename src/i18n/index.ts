@@ -23,6 +23,9 @@ void i18n.use(initReactI18next).init({
   lng: getLocales()[0]?.languageCode ?? 'fr',
   fallbackLng: 'fr',
   defaultNS,
+  // Les clés peuvent contenir ':' (protocoles 16:8, 18:6…) — le namespace passe
+  // toujours par l'option { ns } ou useTranslation(ns), jamais par 'ns:clé'.
+  nsSeparator: false,
   interpolation: {
     // React échappe déjà — double échappement inutile.
     escapeValue: false,

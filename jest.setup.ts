@@ -15,6 +15,17 @@ jest.mock('expo-sqlite', () => ({
   },
 }));
 
+jest.mock('expo-notifications', () => ({
+  setNotificationHandler: jest.fn(),
+  getPermissionsAsync: jest.fn(async () => ({ granted: true })),
+  requestPermissionsAsync: jest.fn(async () => ({ granted: true })),
+  setNotificationChannelAsync: jest.fn(async () => null),
+  scheduleNotificationAsync: jest.fn(async () => 'notification-id'),
+  cancelScheduledNotificationAsync: jest.fn(async () => undefined),
+  AndroidImportance: { DEFAULT: 3 },
+  SchedulableTriggerInputTypes: { DATE: 'date' },
+}));
+
 jest.mock(
   'react-native-safe-area-context',
   () =>

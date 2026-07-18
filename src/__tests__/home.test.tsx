@@ -4,8 +4,11 @@ import '@/i18n';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import HomeScreen from '@/app/index';
+import { HOUR_MS } from '@/domain/fasting';
+import type { FastSession } from '@/schemas/fast-session';
 import type { User } from '@/schemas/user';
 import { appStore } from '@/stores/app-store';
+import { fastingStore } from '@/stores/fasting-store';
 
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
@@ -20,35 +23,95 @@ const guest: User = {
   updatedAt: 1_700_000_000_000,
 };
 
-describe('HomeScreen', () => {
+describe('HomeScreen — pas de session en cours', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     appStore.setState({ status: 'ready', user: guest, repositories: null, error: null });
+    fastingStore.setState({ activeSession: null, reachedHours: [], hydrated: true });
   });
 
-  it('rend le nom produit et l’aperçu typographique via i18n', () => {
+  it('rend l’identité produit et le choix de protocole via i18n', () => {
     render(<HomeScreen />);
 
     expect(screen.getByText('KAIROS')).toBeOnTheScreen();
     expect(screen.getByText('Le moment juste.')).toBeOnTheScreen();
-    expect(screen.getByText('16:00:00')).toBeOnTheScreen();
+    expect(screen.getByText('Choisissez votre protocole')).toBeOnTheScreen();
+    expect(screen.getByText('OMAD')).toBeOnTheScreen();
   });
 
   it('route vers les précautions au tout premier démarrage de jeûne', () => {
+    const mockStartFast = jest.fn(async () => undefined);
+    fastingStore.setState({ startFast: mockStartFast });
     render(<HomeScreen />);
 
     fireEvent.press(screen.getByText('Commencer un jeûne'));
+
     expect(mockPush).toHaveBeenCalledWith('/precautions');
+    expect(mockStartFast).not.toHaveBeenCalled();
   });
 
-  it('ne remontre plus les précautions une fois acceptées', () => {
-    appStore.setState({
-      user: { ...guest, precautionsAcknowledgedAt: 1_700_000_100_000 },
-    });
+  it('démarre le jeûne une fois les précautions acceptées', () => {
+    const mockStartFast = jest.fn(async () => undefined);
+    appStore.setState({ user: { ...guest, precautionsAcknowledgedAt: 1_700_000_100_000 } });
+    fastingStore.setState({ startFast: mockStartFast });
     render(<HomeScreen />);
 
     fireEvent.press(screen.getByText('Commencer un jeûne'));
+
     expect(mockPush).not.toHaveBeenCalled();
-    expect(screen.getByText(/Précautions acceptées/)).toBeOnTheScreen();
+    expect(mockStartFast).toHaveBeenCalledWith({ protocol: '16:8', targetHours: undefined });
+  });
+});
+
+describe('HomeScreen — session en cours', () => {
+  const NOW = 1_700_100_000_000;
+
+  const session: FastSession = {
+    id: 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e',
+    userId: guest.id,
+    protocol: '16:8',
+    targetHours: 16,
+    status: 'running',
+    startedAt: NOW - (17 * HOUR_MS + 3 * 60_000 + 4_000),
+    endedAt: null,
+    createdAt: NOW,
+    updatedAt: NOW,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers({ now: NOW });
+    appStore.setState({
+      status: 'ready',
+      user: { ...guest, precautionsAcknowledgedAt: guest.createdAt },
+      repositories: null,
+      error: null,
+    });
+    fastingStore.setState({ activeSession: session, reachedHours: [12, 16], hydrated: true });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('affiche le chrono, l’objectif, les paliers atteints et les actions', () => {
+    render(<HomeScreen />);
+
+    expect(screen.getByText('17:03:04')).toBeOnTheScreen();
+    expect(screen.getByText(/Objectif 16 h/)).toBeOnTheScreen();
+    expect(screen.getByText('12 h')).toBeOnTheScreen();
+    expect(screen.getByText('16 h')).toBeOnTheScreen();
+    expect(screen.getByText(/Prochain palier : 18 h/)).toBeOnTheScreen();
+    expect(screen.getByText('Terminer le jeûne')).toBeOnTheScreen();
+    expect(screen.getByText('Abandonner')).toBeOnTheScreen();
+  });
+
+  it('Terminer appelle completeFast', () => {
+    const mockComplete = jest.fn(async () => undefined);
+    fastingStore.setState({ completeFast: mockComplete });
+    render(<HomeScreen />);
+
+    fireEvent.press(screen.getByText('Terminer le jeûne'));
+    expect(mockComplete).toHaveBeenCalled();
   });
 });

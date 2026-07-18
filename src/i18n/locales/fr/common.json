@@ -1,10 +1,38 @@
 {
   "appName": "KAIROS",
   "tagline": "Le moment juste.",
-  "home": {
-    "sampleCountdown": "16:00:00",
-    "sampleCountdownLabel": "Aperçu typographique du futur timer",
-    "startFast": "Commencer un jeûne",
-    "timerComingSoon": "Précautions acceptées — le timer arrive à l'étape 4."
+  "timer": {
+    "chooseProtocol": "Choisissez votre protocole",
+    "protocols": {
+      "16:8": "16:8",
+      "18:6": "18:6",
+      "20:4": "20:4",
+      "OMAD": "OMAD",
+      "custom": "Personnalisé"
+    },
+    "protocolHours": "{{hours}} h de jeûne",
+    "customHoursLabel": "Durée cible en heures (1 à 168)",
+    "customHoursPlaceholder": "ex. 36",
+    "start": "Commencer un jeûne",
+    "startError": "Impossible de démarrer le jeûne",
+    "elapsedLabel": "Temps de jeûne",
+    "targetLabel": "Objectif {{hours}} h — {{protocol}}",
+    "remaining": "Reste {{time}}",
+    "overTarget": "Objectif atteint · +{{time}}",
+    "nextMilestone": "Prochain palier : {{hours}} h",
+    "allMilestonesReached": "Tous les paliers sont atteints",
+    "reachedTitle": "Paliers atteints",
+    "noMilestoneYet": "Premier palier à 12 h",
+    "complete": "Terminer le jeûne",
+    "cancel": "Abandonner",
+    "cancelConfirmTitle": "Abandonner ce jeûne ?",
+    "cancelConfirmBody": "La session ne sera pas comptabilisée dans votre historique.",
+    "cancelConfirmYes": "Abandonner",
+    "cancelConfirmNo": "Continuer"
+  },
+  "notifications": {
+    "channelName": "Paliers biochimiques",
+    "milestoneTitle": "Palier {{hours}} h atteint",
+    "milestoneBody": "Votre corps vient de franchir {{hours}} heures de jeûne. Ouvrez KAIROS pour voir ce qui se passe."
   }
 }
