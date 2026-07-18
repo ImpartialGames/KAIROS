@@ -4,6 +4,8 @@ dist/
 coverage/
 package-lock.json
 assets/
+# Contenu généré — seul generate-content.ts en est la source
+src/content/generated/
 # Documents produit — ne pas reformater automatiquement
 docs-source/
 CLAUDE.md

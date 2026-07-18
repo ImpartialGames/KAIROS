@@ -15,6 +15,7 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "typecheck": "tsc --noEmit",
+    "generate:content": "tsx scripts/generate-content.ts",
     "test": "jest"
   },
   "dependencies": {
@@ -62,6 +63,7 @@
     "prettier": "^3.9.5",
     "react-test-renderer": "^19.2.3",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.1",
     "typescript": "~6.0.3"
   },
   "jest": {

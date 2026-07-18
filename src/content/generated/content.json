@@ -1,0 +1,236 @@
+{
+  "lexicon": [
+    {
+      "id": "cetose",
+      "term": "Cétose",
+      "definition": "État métabolique dans lequel, en l'absence ou en cas de très faible apport en glucides, le foie convertit les acides gras en corps cétoniques (acétone, acétoacétate, bêta-hydroxybutyrate). Ces cétones deviennent la principale source d'énergie pour de nombreux tissus, notamment le cerveau et les muscles.",
+      "effetsCorps": "Préservation du glycogène, combustion des graisses, meilleure sensibilité à l'insuline.",
+      "effetsEsprit": "Le bêta-hydroxybutyrate offre une énergie efficace au cerveau, favorisant clarté mentale et stabilité de l'humeur.",
+      "timeline": "Début vers 16h (légère cétogenèse), renforcement à 18h, pleinement établie à 24h, niveaux plus élevés à 36h et au-delà.",
+      "source": "lexique"
+    },
+    {
+      "id": "autophagie",
+      "term": "Autophagie",
+      "definition": "Processus cellulaire de « nettoyage » par lequel la cellule dégrade et recycle ses composants endommagés ou inutilisés.",
+      "effetsCorps": "Réduit le stress oxydatif, protège contre le vieillissement, prévention de maladies neurodégénératives et du cancer.",
+      "effetsEsprit": "Nettoyage cellulaire efficace → fonction neuronale optimale, clarté cognitive, régulation de l'humeur.",
+      "timeline": "Déclenchement à partir de 18h, optimisée à 24h, maximale lors des jeûnes prolongés (48h+).",
+      "source": "lexique"
+    },
+    {
+      "id": "mitophagie",
+      "term": "Mitophagie",
+      "definition": "Forme spécialisée d'autophagie ciblant spécifiquement les mitochondries endommagées ou dysfonctionnelles.",
+      "effetsCorps": "Préserve l'efficacité énergétique cellulaire, limite les radicaux libres, réduit le stress oxydatif.",
+      "effetsEsprit": "Meilleure performance cérébrale, prévention de troubles neurodégénératifs.",
+      "timeline": "Activation notable à partir de 48h, renforcée à 96h.",
+      "source": "lexique"
+    },
+    {
+      "id": "beta-hydroxybutyrate",
+      "term": "Bêta-hydroxybutyrate (BHB)",
+      "definition": "Principal corps cétonique produit lors de la cétose, carburant alternatif en l'absence de glucose suffisant.",
+      "effetsCorps": "Préserve la masse musculaire, favorise la combustion des graisses.",
+      "effetsEsprit": "Propriétés neuroprotectrices et anti-inflammatoires, réduit la fatigue mentale, améliore l'humeur.",
+      "timeline": "Production significative dès 18h, niveaux optimaux à 24h et 36h, maintenus lors des jeûnes prolongés.",
+      "source": "lexique"
+    },
+    {
+      "id": "mtor",
+      "term": "mTOR",
+      "definition": "Protéine kinase (mammalian target of rapamycin) centrale dans la régulation de la croissance cellulaire, la synthèse protéique et le métabolisme.",
+      "effetsCorps": "Activité élevée = anabolisme ; l'inhibition (jeûne, restriction calorique) stimule l'autophagie et protège contre le stress et le vieillissement.",
+      "effetsEsprit": "Régulation adéquate → fonction cérébrale optimale, réduction des risques neurodégénératifs.",
+      "timeline": "Inhibition marquée généralement à partir de 48h.",
+      "source": "lexique"
+    },
+    {
+      "id": "glucagon",
+      "term": "Glucagon",
+      "definition": "Hormone produite par les cellules alpha du pancréas, agit en opposition à l'insuline en augmentant la glycémie.",
+      "effetsCorps": "Stimule la glycogénolyse et la néoglucogenèse, assure l'approvisionnement en glucose pendant le jeûne.",
+      "effetsEsprit": "Équilibre glucagon/insuline = disponibilité énergétique stable pour le cerveau, concentration et vigilance.",
+      "timeline": "Activation notable à partir de 24h (glycogène hépatique épuisé).",
+      "source": "lexique"
+    },
+    {
+      "id": "insuline",
+      "term": "Insuline",
+      "definition": "Hormone produite par les cellules bêta du pancréas, régule la glycémie.",
+      "effetsCorps": "Permet l'absorption du glucose par les cellules ; bonne sensibilité = prévention diabète type 2.",
+      "effetsEsprit": "Glycémie stable = meilleure fonction cérébrale, humeur équilibrée.",
+      "timeline": "Diminution dès 12h, maintenue tout au long du jeûne.",
+      "source": "lexique"
+    },
+    {
+      "id": "sirtuines",
+      "term": "Sirtuines",
+      "definition": "Famille de protéines régulant métabolisme, réponse au stress, réparation de l'ADN et longévité cellulaire.",
+      "effetsCorps": "Activation (restriction calorique/jeûne) protège contre le vieillissement cellulaire, améliore la fonction mitochondriale.",
+      "effetsEsprit": "Résistance au stress cellulaire → préservation de la fonction cognitive.",
+      "timeline": "Activation significative généralement à partir de 48h.",
+      "source": "lexique"
+    },
+    {
+      "id": "ampk",
+      "term": "AMPK",
+      "definition": "Enzyme (AMP-activated protein kinase) agissant comme capteur énergétique cellulaire.",
+      "effetsCorps": "Activée par déficit énergétique (ratio AMP/ATP élevé), stimule les voies cataboliques, inhibe l'anabolisme, favorise la combustion des graisses.",
+      "effetsEsprit": "Approvisionnement énergétique stable → réduction de la fatigue mentale, meilleure concentration.",
+      "timeline": "Activation significative généralement à partir de 48h.",
+      "source": "lexique"
+    },
+    {
+      "id": "foxo",
+      "term": "FOXO",
+      "definition": "Famille de facteurs de transcription régulant l'expression de gènes impliqués dans la résistance au stress, la réparation cellulaire, le métabolisme et la longévité.",
+      "effetsCorps": "Meilleure gestion du stress cellulaire, activation de l'autophagie, protection contre les dommages oxydatifs.",
+      "effetsEsprit": "Survie et réparation cellulaire → fonction neuronale optimale, protection contre le déclin cognitif.",
+      "timeline": "Activation typique lors de jeûnes prolongés, augmentation notable autour de 56h.",
+      "source": "lexique"
+    },
+    {
+      "id": "igf-1",
+      "term": "IGF-1",
+      "definition": "Hormone (insulin-like growth factor 1) structurellement proche de l'insuline, essentielle à la croissance, au développement cellulaire et à la régénération tissulaire.",
+      "effetsCorps": "Favorise prolifération et différenciation cellulaire ; des niveaux élevés sont associés à un risque accru de certains cancers. Sa réduction lors du jeûne est liée à des effets anti-âge.",
+      "effetsEsprit": "Équilibre optimal important pour le développement neuronal et les fonctions cognitives.",
+      "timeline": "Diminution notable de l’IGF-1 lors des jeûnes prolongés, autour de 56 h.",
+      "source": "lexique"
+    },
+    {
+      "id": "bdnf",
+      "term": "BDNF (Brain-Derived Neurotrophic Factor)",
+      "definition": "Le jeûne stimule sa production, favorisant la croissance de nouveaux neurones et de nouvelles connexions synaptiques.",
+      "effetsCorps": null,
+      "effetsEsprit": null,
+      "timeline": null,
+      "source": "biochimie"
+    }
+  ],
+  "timeline": [
+    {
+      "hours": 12,
+      "title": "12 heures",
+      "whatHappens": "Fin de la phase digestive, sortie de l'état postprandial. Mobilisation initiale du glycogène hépatique.",
+      "mechanisms": ["baisse progressive de l'insuline", "mobilisation du glycogène"],
+      "benefitsBody": "Amélioration de la sensibilité à l'insuline, début de transition vers l'utilisation des réserves.",
+      "benefitsMind": "Clarté mentale initiale, réduction de la fatigue liée aux variations d'énergie."
+    },
+    {
+      "hours": 16,
+      "title": "16 heures",
+      "whatHappens": "Transition marquée du glucose vers les graisses stockées.",
+      "mechanisms": [
+        "activation de la lipolyse (hormone-sensitive lipase)",
+        "début de la cétogenèse légère"
+      ],
+      "benefitsBody": "Réduction des réserves de graisses, meilleure gestion des pics glycémiques.",
+      "benefitsMind": "Énergie alternative au cerveau via premiers corps cétoniques, concentration soutenue."
+    },
+    {
+      "hours": 18,
+      "title": "18 heures",
+      "whatHappens": "Glycogène qui s'amenuise, production accrue de corps cétoniques.",
+      "mechanisms": [
+        "renforcement de la cétogenèse (BHB)",
+        "déclenchement de l'autophagie (inhibition progressive de mTOR)"
+      ],
+      "benefitsBody": "Élimination des cellules endommagées, réduction du stress oxydatif.",
+      "benefitsMind": "Effets neuroprotecteurs du BHB, clarté mentale."
+    },
+    {
+      "hours": 24,
+      "title": "24 heures",
+      "whatHappens": "Glycogène hépatique quasi épuisé, dépendance quasi exclusive aux graisses.",
+      "mechanisms": ["cétose complète", "autophagie amplifiée", "augmentation du glucagon"],
+      "benefitsBody": "Réduction du risque de cancer (élimination cellules dysfonctionnelles), santé cardiovasculaire.",
+      "benefitsMind": "Énergie stable pour le cerveau, concentration, stabilité émotionnelle."
+    },
+    {
+      "hours": 36,
+      "title": "36 heures",
+      "whatHappens": "Production élevée et stable de corps cétoniques.",
+      "mechanisms": [
+        "cétose approfondie",
+        "optimisation de l'autophagie",
+        "réduction de l'inflammation"
+      ],
+      "benefitsBody": "Réduction des risques d'obésité et de troubles métaboliques, limitation de l'inflammation chronique.",
+      "benefitsMind": "Concentration, mémoire, stabilité de l'humeur, réduction de la fatigue mentale et de l'anxiété."
+    },
+    {
+      "hours": 48,
+      "title": "48 heures",
+      "whatHappens": "Réorientation forte vers la maintenance cellulaire.",
+      "mechanisms": ["autophagie intensive (sirtuines, AMPK)", "suppression de mTOR"],
+      "benefitsBody": "Protection contre le vieillissement cellulaire, prévention neurodégénérative, fonction immunitaire améliorée.",
+      "benefitsMind": "Clarté mentale accrue, amélioration potentielle de l'humeur, sensation de renouveau mental."
+    },
+    {
+      "hours": 56,
+      "title": "56 heures",
+      "whatHappens": "Maintien et perfectionnement des mécanismes précédents.",
+      "mechanisms": [
+        "maintien de la cétose avancée",
+        "poursuite de l'autophagie",
+        "activation de gènes de survie (FOXO)"
+      ],
+      "benefitsBody": "Prévention des maladies métaboliques, résilience cellulaire.",
+      "benefitsMind": "Concentration et vigilance maintenues, gestion du stress, effet positif sur l'humeur."
+    },
+    {
+      "hours": 72,
+      "title": "72 heures",
+      "whatHappens": "Adaptation métabolique complète, cétose profonde, nettoyage cellulaire optimal.",
+      "mechanisms": [
+        "cétose profonde",
+        "régénération immunitaire (apoptose des cellules immunitaires vieillissantes)",
+        "autophagie maximale",
+        "sensibilité à l'insuline améliorée"
+      ],
+      "benefitsBody": "Réduction significative des inflammations systémiques, régénération cellulaire, longévité.",
+      "benefitsMind": "Fonction cognitive et neuroprotection, diminution de l'anxiété, bien-être mental."
+    },
+    {
+      "hours": 96,
+      "title": "96 heures",
+      "whatHappens": "Phase extrême de conservation, adaptations métaboliques pleinement déployées.",
+      "mechanisms": [
+        "autophagie et mitophagie optimisées",
+        "baisse drastique de l'insuline et de l'IGF-1, hausse de l'hormone de croissance",
+        "réduction du stress oxydatif et de l'inflammation"
+      ],
+      "benefitsBody": "Réduction du risque de cancers, santé cardiovasculaire, protection contre le vieillissement.",
+      "benefitsMind": "Neuroprotection avancée, mémoire renforcée, stabilité émotionnelle, clarté mentale."
+    }
+  ],
+  "synergies": [
+    {
+      "id": "cetose-autophagie",
+      "title": "Cétose ↔ Autophagie",
+      "description": "La production de corps cétoniques signale un état de jeûne qui stimule l'autophagie."
+    },
+    {
+      "id": "mtor-ampk",
+      "title": "mTOR ↔ AMPK",
+      "description": "Travaillent en tandem pour basculer le métabolisme de la croissance vers la maintenance/réparation."
+    },
+    {
+      "id": "sirtuines-foxo",
+      "title": "Sirtuines ↔ FOXO",
+      "description": "Se renforcent mutuellement pour une défense cellulaire robuste."
+    },
+    {
+      "id": "insuline-glucagon",
+      "title": "Insuline ↔ Glucagon",
+      "description": "Équilibre hormonal qui stabilise la glycémie tout en mobilisant les réserves."
+    },
+    {
+      "id": "autophagie-mitophagie",
+      "title": "Autophagie ↔ Mitophagie",
+      "description": "Nettoyage général de la cellule + nettoyage spécifique des mitochondries."
+    }
+  ]
+}
