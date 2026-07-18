@@ -1,0 +1,20 @@
+{
+  "link": "Timeline",
+  "title": "Timeline biochimique",
+  "subtitle": "Ce qui se passe dans votre corps, heure par heure.",
+  "elapsed": "{{time}} de jeûne",
+  "educational": "Démarrez un jeûne pour suivre votre progression en direct.",
+  "mechanisms": "Mécanismes",
+  "body": "Corps",
+  "mind": "Esprit",
+  "legend": {
+    "before": "Avant cétose",
+    "after": "Cétose et au-delà"
+  },
+  "status": {
+    "past": "Atteint",
+    "current": "En cours",
+    "next": "Prochain palier",
+    "future": "À venir"
+  }
+}

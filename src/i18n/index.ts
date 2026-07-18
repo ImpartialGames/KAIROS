@@ -4,6 +4,7 @@ import { initReactI18next } from 'react-i18next';
 
 import frCommon from '@/i18n/locales/fr/common.json';
 import frPrecautions from '@/i18n/locales/fr/precautions.json';
+import frTimeline from '@/i18n/locales/fr/timeline.json';
 
 /**
  * i18next — aucune chaîne en dur dans les composants (CLAUDE.md).
@@ -12,7 +13,7 @@ import frPrecautions from '@/i18n/locales/fr/precautions.json';
  * n'est pas encore tranché (cahier des charges §6).
  */
 export const resources = {
-  fr: { common: frCommon, precautions: frPrecautions },
+  fr: { common: frCommon, precautions: frPrecautions, timeline: frTimeline },
 } as const;
 
 export const defaultNS = 'common';
