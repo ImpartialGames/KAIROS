@@ -42,9 +42,26 @@ export const SynergySchema = z.object({
 });
 export type Synergy = z.infer<typeof SynergySchema>;
 
-export const ContentBundleSchema = z.object({
-  lexicon: z.array(LexiconEntrySchema).min(1),
-  timeline: z.array(TimelinePhaseSchema).min(1),
-  synergies: z.array(SynergySchema).min(1),
-});
+const unique = <T>(values: readonly T[]): boolean => new Set(values).size === values.length;
+
+export const ContentBundleSchema = z
+  .object({
+    lexicon: z.array(LexiconEntrySchema).min(1),
+    timeline: z.array(TimelinePhaseSchema).min(1),
+    synergies: z.array(SynergySchema).min(1),
+  })
+  // Les id/heures servent de clés (lexiconById, timelineByHours) : un doublon
+  // écraserait silencieusement une entrée. On l'interdit dès la génération.
+  .refine((b) => unique(b.lexicon.map((e) => e.id)), {
+    message: 'id de lexique en double',
+    path: ['lexicon'],
+  })
+  .refine((b) => unique(b.timeline.map((p) => p.hours)), {
+    message: 'palier de timeline en double',
+    path: ['timeline'],
+  })
+  .refine((b) => unique(b.synergies.map((s) => s.id)), {
+    message: 'id de synergie en double',
+    path: ['synergies'],
+  });
 export type ContentBundle = z.infer<typeof ContentBundleSchema>;

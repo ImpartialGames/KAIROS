@@ -83,7 +83,13 @@ export function createFastingStore({
         targetHours: input.targetHours,
       });
       set({ activeSession: session, reachedHours: [] });
-      await notifications.scheduleMilestones(session);
+      // Best-effort : le jeûne tourne déjà (source de vérité). Un échec de
+      // planification ne doit pas faire croire à l'UI que le démarrage a raté.
+      try {
+        await notifications.scheduleMilestones(session);
+      } catch {
+        // Notifications indisponibles : le timer reste pleinement fonctionnel.
+      }
       await get().syncMilestones();
     },
 

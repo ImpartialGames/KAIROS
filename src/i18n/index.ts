@@ -3,6 +3,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import frCommon from '@/i18n/locales/fr/common.json';
+import frErrors from '@/i18n/locales/fr/errors.json';
 import frJournal from '@/i18n/locales/fr/journal.json';
 import frLexicon from '@/i18n/locales/fr/lexicon.json';
 import frPrecautions from '@/i18n/locales/fr/precautions.json';
@@ -21,6 +22,7 @@ export const resources = {
     timeline: frTimeline,
     lexicon: frLexicon,
     journal: frJournal,
+    errors: frErrors,
   },
 } as const;
 

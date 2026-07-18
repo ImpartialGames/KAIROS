@@ -90,6 +90,15 @@ describe('fasting-store (intégration)', () => {
     );
   });
 
+  it('démarre même si la planification des notifications échoue (best-effort)', async () => {
+    await appStore.getState().acknowledgePrecautions();
+    notifications.scheduleMilestones.mockRejectedValueOnce(new Error('notifs indisponibles'));
+    const store = newFastingStore();
+
+    await expect(store.getState().startFast({ protocol: '16:8' })).resolves.toBeUndefined();
+    expect(store.getState().activeSession?.status).toBe('running');
+  });
+
   it('enregistre les paliers franchis au fil du temps, sans doublon', async () => {
     await appStore.getState().acknowledgePrecautions();
     const store = newFastingStore();

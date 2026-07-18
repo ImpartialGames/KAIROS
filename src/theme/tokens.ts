@@ -61,3 +61,16 @@ export const fonts = {
 
 export type SemanticColor = keyof typeof colors;
 export type FontToken = keyof typeof fonts;
+
+/**
+ * Applique une opacité à une couleur hex (#RRGGBB) du thème → `rgba(...)`.
+ * Permet aux surfaces translucides (verre) de dériver des tokens plutôt que
+ * de coder des valeurs de couleur en dur.
+ */
+export function withAlpha(hex: string, alpha: number): string {
+  const value = hex.replace('#', '');
+  const r = parseInt(value.slice(0, 2), 16);
+  const g = parseInt(value.slice(2, 4), 16);
+  const b = parseInt(value.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}

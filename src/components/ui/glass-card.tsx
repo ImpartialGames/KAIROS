@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet } from 'react-native';
 
 import { View } from '@/tw';
-import { colors } from '@/theme/tokens';
+import { colors, withAlpha } from '@/theme/tokens';
 
 /**
  * Surface « liquid glass » : flou de fond (matériau translucide, l'équivalent
@@ -51,19 +51,23 @@ export function GlassCard({
   );
 }
 
-const TINT = 'rgba(26,23,18,0.55)';
-const TINT_ELEVATED = 'rgba(36,31,24,0.68)';
+// Teintes dérivées des tokens du thème (pas de couleur en dur).
+const TINT = withAlpha(colors.surface, 0.55);
+const TINT_ELEVATED = withAlpha(colors.surfaceRaised, 0.68);
+
+// Ombre en noir pur (primitive de profondeur, pas une couleur de marque).
+const SHADOW_COLOR = '#000000';
 
 const shadow = StyleSheet.create({
   regular: {
-    shadowColor: '#000000',
+    shadowColor: SHADOW_COLOR,
     shadowOpacity: 0.35,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
     elevation: 6,
   },
   elevated: {
-    shadowColor: '#000000',
+    shadowColor: SHADOW_COLOR,
     shadowOpacity: 0.45,
     shadowRadius: 24,
     shadowOffset: { width: 0, height: 14 },
@@ -75,6 +79,7 @@ const styles = StyleSheet.create({
   hairline: {
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
-    borderTopColor: 'rgba(242,234,217,0.16)',
+    // Liseré supérieur = lumière qui accroche le bord (crème du thème, très diffus).
+    borderTopColor: withAlpha(colors.content, 0.16),
   },
 });

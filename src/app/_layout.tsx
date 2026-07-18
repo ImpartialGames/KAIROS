@@ -13,6 +13,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { BootstrapError } from '@/components/app/bootstrap-error';
 import { initFastingNotifications } from '@/notifications/fasting-notifications';
 import { appStore, useAppStore } from '@/stores/app-store';
 import { fastingStore } from '@/stores/fasting-store';
@@ -47,17 +48,27 @@ export default function RootLayout() {
   }, [appStatus]);
 
   const fontsReady = fontsLoaded || fontError !== null;
-  // 'error' laisse l'app se rendre : mieux vaut une UI dégradée qu'un splash infini.
-  const appReady = appStatus === 'ready' || appStatus === 'error';
+  // Le splash se retire dès qu'on a quelque chose à montrer : l'app OU l'écran d'erreur.
+  const settled = appStatus === 'ready' || appStatus === 'error';
 
   useEffect(() => {
-    if (fontsReady && appReady) {
+    if (fontsReady && settled) {
       void SplashScreen.hideAsync();
     }
-  }, [fontsReady, appReady]);
+  }, [fontsReady, settled]);
 
-  if (!fontsReady || !appReady) {
+  if (!fontsReady || !settled) {
     return null;
+  }
+
+  // Échec d'ouverture de la base : message clair + réessayer (pas d'UI muette).
+  if (appStatus === 'error') {
+    return (
+      <>
+        <StatusBar style="light" />
+        <BootstrapError onRetry={() => void appStore.getState().bootstrap()} />
+      </>
+    );
   }
 
   return (
