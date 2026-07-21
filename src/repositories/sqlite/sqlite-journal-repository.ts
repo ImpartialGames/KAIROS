@@ -92,6 +92,30 @@ export class SqliteJournalRepository implements JournalRepository {
     }
   }
 
+  async upsert(rawEntry: JournalEntry): Promise<void> {
+    const entry = JournalEntrySchema.parse(rawEntry);
+    await this.db.runAsync(
+      `INSERT INTO journal_entries (id, user_id, session_id, mood, note, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         user_id = excluded.user_id,
+         session_id = excluded.session_id,
+         mood = excluded.mood,
+         note = excluded.note,
+         created_at = excluded.created_at,
+         updated_at = excluded.updated_at`,
+      [
+        entry.id,
+        entry.userId,
+        entry.sessionId,
+        entry.mood,
+        entry.note,
+        entry.createdAt,
+        entry.updatedAt,
+      ],
+    );
+  }
+
   async getById(id: string): Promise<JournalEntry | null> {
     const row = await this.db.getFirstAsync<JournalEntryRow>(
       'SELECT * FROM journal_entries WHERE id = ?',

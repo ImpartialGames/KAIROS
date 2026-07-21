@@ -19,4 +19,12 @@ export interface FastSessionRepository {
   complete(id: string, endedAt: number): Promise<FastSession>;
   /** Abandonne la session en cours (non comptabilisée dans les statistiques). */
   cancel(id: string, endedAt: number): Promise<FastSession>;
+  /**
+   * Écrit une session complète telle quelle (id, statut, timestamps d'origine) —
+   * brique de la synchro descendante (pull cloud→local, Phase 1). Mise à jour EN
+   * PLACE par id : ne déclenche pas le CASCADE qui supprimerait les paliers
+   * enfants. Idempotent. À l'appelant de préserver l'invariant « une seule
+   * session en cours » (l'index unique partiel le fait respecter sinon).
+   */
+  upsert(session: FastSession): Promise<void>;
 }

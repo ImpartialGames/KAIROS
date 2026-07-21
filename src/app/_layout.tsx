@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { runGuestMigrationOnSignIn } from '@/account/account-sync';
+import { syncAccountOnSignIn } from '@/account/account-sync';
 import { BootstrapError } from '@/components/app/bootstrap-error';
 import { GlassTabBar } from '@/components/app/glass-tab-bar';
 import { initFastingNotifications } from '@/notifications/fasting-notifications';
@@ -70,10 +70,11 @@ export default function RootLayout() {
   }, [appStatus]);
 
   useEffect(() => {
-    // À la connexion : convertit l'invité en inscrit (en place + upload cloud).
-    // Idempotent → un échec réseau réessaie à la prochaine connexion.
+    // À la connexion : migration montante (invité → inscrit) puis synchro
+    // descendante (rapatriement de l'historique multi-appareils). Idempotent →
+    // un échec réseau réessaie à la prochaine connexion.
     if (appStatus === 'ready' && authStatus === 'signedIn' && authUserId) {
-      void runGuestMigrationOnSignIn(authUserId).catch(() => undefined);
+      void syncAccountOnSignIn(authUserId).catch(() => undefined);
     }
   }, [appStatus, authStatus, authUserId]);
 

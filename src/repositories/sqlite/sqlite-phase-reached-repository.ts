@@ -59,6 +59,16 @@ export class SqlitePhaseReachedRepository implements PhaseReachedRepository {
     return toPhaseReached(row);
   }
 
+  async upsert(rawPhase: PhaseReached): Promise<void> {
+    const phase = PhaseReachedSchema.parse(rawPhase);
+    // INSERT OR IGNORE : le jalon (par id ou par (session, palier)) est immuable.
+    // La session parente doit exister (FK) — garanti par l'ordre de la synchro.
+    await this.db.runAsync(
+      'INSERT OR IGNORE INTO phases_reached (id, session_id, hours, reached_at) VALUES (?, ?, ?, ?)',
+      [phase.id, phase.sessionId, phase.hours, phase.reachedAt],
+    );
+  }
+
   async listBySession(sessionId: string): Promise<PhaseReached[]> {
     const rows = await this.db.getAllAsync<PhaseReachedRow>(
       'SELECT * FROM phases_reached WHERE session_id = ? ORDER BY hours ASC',

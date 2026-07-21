@@ -123,6 +123,38 @@ export class SqliteFastSessionRepository implements FastSessionRepository {
     return this.end(id, 'cancelled', endedAt);
   }
 
+  async upsert(rawSession: FastSession): Promise<void> {
+    const s = FastSessionSchema.parse(rawSession);
+    // ON CONFLICT(id) DO UPDATE : mise à jour EN PLACE. Un INSERT OR REPLACE
+    // supprimerait la ligne puis la réinsèrerait, déclenchant le CASCADE qui
+    // effacerait les paliers enfants — ce que l'on veut éviter en synchro.
+    await this.db.runAsync(
+      `INSERT INTO fast_sessions
+         (id, user_id, protocol, target_hours, status, started_at, ended_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         user_id = excluded.user_id,
+         protocol = excluded.protocol,
+         target_hours = excluded.target_hours,
+         status = excluded.status,
+         started_at = excluded.started_at,
+         ended_at = excluded.ended_at,
+         created_at = excluded.created_at,
+         updated_at = excluded.updated_at`,
+      [
+        s.id,
+        s.userId,
+        s.protocol,
+        s.targetHours,
+        s.status,
+        s.startedAt,
+        s.endedAt,
+        s.createdAt,
+        s.updatedAt,
+      ],
+    );
+  }
+
   private async end(
     id: string,
     status: Extract<FastSessionStatus, 'completed' | 'cancelled'>,

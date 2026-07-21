@@ -8,4 +8,10 @@ export interface PhaseReachedRepository {
   record(input: RecordPhaseInput): Promise<PhaseReached>;
   /** Jalons d'une session, triés par palier horaire croissant. */
   listBySession(sessionId: string): Promise<PhaseReached[]>;
+  /**
+   * Écrit un jalon complet (id d'origine préservé) — synchro descendante
+   * (pull cloud→local). Un jalon atteint est un fait immuable : s'il existe déjà
+   * (par id ou par (session, palier)), l'existant est conservé. Idempotent.
+   */
+  upsert(phase: PhaseReached): Promise<void>;
 }

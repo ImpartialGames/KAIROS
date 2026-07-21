@@ -2,7 +2,9 @@ import { migrateGuestToAccount } from '@/migration/guest-migration';
 import type { Repositories } from '@/repositories';
 import type { User } from '@/schemas/user';
 import { appStore } from '@/stores/app-store';
+import { fastingStore } from '@/stores/fasting-store';
 import { getSupabase } from '@/supabase/client';
+import { pullAccountToLocal } from '@/sync/pull-sync';
 import type { RemoteStore } from '@/sync/remote-store';
 import { SupabaseRemoteStore } from '@/sync/supabase-remote-store';
 
@@ -34,17 +36,29 @@ export async function migrateGuestIfNeeded(params: {
 }
 
 /**
- * Glu de production : câble la migration au store applicatif et au vrai cloud.
- * Appelée par _layout quand l'auth passe en « connecté ».
+ * Glu de production, appelée par _layout à chaque passage en « connecté ».
+ * Deux temps, dans l'ordre :
+ *   1. migration montante — convertit l'invité en inscrit + upload initial ;
+ *   2. synchro descendante — rapatrie l'historique du compte (autres appareils).
+ * Enchaînée à chaque connexion (idempotente) : un relancement d'app rapatrie
+ * les changements faits ailleurs depuis. Recharge l'utilisateur (précautions
+ * éventuellement rapatriées) et ré-hydrate le jeûne actif si le cloud en a un.
  */
-export async function runGuestMigrationOnSignIn(authUserId: string): Promise<void> {
+export async function syncAccountOnSignIn(authUserId: string): Promise<void> {
   const { repositories, user } = appStore.getState();
   if (!repositories || !user) {
     return;
   }
   const remote = new SupabaseRemoteStore(getSupabase());
-  const updated = await migrateGuestIfNeeded({ repositories, remote, localUser: user, authUserId });
-  if (updated) {
-    appStore.getState().setUser(updated);
+  const migrated = await migrateGuestIfNeeded({ repositories, remote, localUser: user, authUserId });
+  const localUser = migrated ?? user;
+
+  await pullAccountToLocal({ repositories, remote, localUser, authUserId });
+
+  const fresh = await repositories.users.getCurrent();
+  if (fresh) {
+    appStore.getState().setUser(fresh);
   }
+  // Un jeûne en cours rapatriée d'un autre appareil doit apparaître à l'écran.
+  await fastingStore.getState().hydrate();
 }

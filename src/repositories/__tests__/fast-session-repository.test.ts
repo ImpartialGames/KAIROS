@@ -105,4 +105,44 @@ describe('SqliteFastSessionRepository', () => {
     const recent = await repos.fastSessions.list(userId, { since: T0 - 50 * HOUR });
     expect(recent.map((s) => s.startedAt)).toEqual([T0 - 24 * HOUR, T0 - 48 * HOUR]);
   });
+
+  describe('upsert (synchro descendante)', () => {
+    it('insère une session complète telle quelle (id et timestamps préservés)', async () => {
+      const id = randomUUID();
+      await repos.fastSessions.upsert({
+        id,
+        userId,
+        protocol: '18:6',
+        targetHours: 18,
+        status: 'completed',
+        startedAt: T0,
+        endedAt: T0 + 18 * HOUR,
+        createdAt: T0,
+        updatedAt: T0,
+      });
+
+      const stored = await repos.fastSessions.getById(id);
+      expect(stored).toMatchObject({ id, status: 'completed', startedAt: T0, createdAt: T0 });
+    });
+
+    it('met à jour EN PLACE sans supprimer les paliers enfants (pas de CASCADE)', async () => {
+      const session = await repos.fastSessions.start({
+        userId,
+        protocol: 'custom',
+        targetHours: 24,
+        startedAt: T0,
+      });
+      await repos.phasesReached.record({ sessionId: session.id, hours: 12, reachedAt: T0 + 12 * HOUR });
+
+      // Clôture par upsert (même id, statut completed) — les paliers survivent.
+      await repos.fastSessions.upsert({
+        ...session,
+        status: 'completed',
+        endedAt: T0 + 16 * HOUR,
+      });
+
+      expect((await repos.fastSessions.getById(session.id))?.status).toBe('completed');
+      expect(await repos.phasesReached.listBySession(session.id)).toHaveLength(1);
+    });
+  });
 });

@@ -19,4 +19,9 @@ export interface JournalRepository {
   getById(id: string): Promise<JournalEntry | null>;
   /** Entrées triées de la plus récente à la plus ancienne. */
   list(userId: string, options?: JournalListOptions): Promise<JournalEntry[]>;
+  /**
+   * Écrit une entrée complète (id, timestamps d'origine préservés) — synchro
+   * descendante (pull cloud→local). Mise à jour EN PLACE par id. Idempotent.
+   */
+  upsert(entry: JournalEntry): Promise<void>;
 }
