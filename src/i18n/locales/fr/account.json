@@ -17,5 +17,9 @@
   "signedInTitle": "Connecté",
   "signedInBody": "Vos données sont sauvegardées et synchronisées sur ce compte.",
   "signOut": "Se déconnecter",
-  "loading": "Chargement…"
+  "loading": "Chargement…",
+  "offerTitle": "Sauvegardez vos progrès",
+  "offerBody": "Créez un compte gratuit pour ne rien perdre et retrouver vos données sur tous vos appareils.",
+  "offerCta": "Créer un compte",
+  "offerDismiss": "Plus tard"
 }
