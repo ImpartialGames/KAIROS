@@ -8,6 +8,7 @@ import { authStore, type AuthState } from '@/stores/auth-store';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ back: jest.fn() }),
+  useLocalSearchParams: () => ({}),
 }));
 
 const setAuth = (over: Partial<AuthState>) => {

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -76,6 +76,8 @@ function Field({
 export default function AccountScreen() {
   const { t } = useTranslation('account');
   const router = useRouter();
+  // La bannière « Créer un compte » ouvre directement le formulaire d'inscription.
+  const params = useLocalSearchParams<{ mode?: string }>();
 
   const status = useAuthStore((s) => s.status);
   const user = useAuthStore((s) => s.user);
@@ -87,7 +89,7 @@ export default function AccountScreen() {
   const requestPasswordReset = useAuthStore((s) => s.requestPasswordReset);
   const updatePassword = useAuthStore((s) => s.updatePassword);
 
-  const [mode, setMode] = useState<Mode>('signIn');
+  const [mode, setMode] = useState<Mode>(params.mode === 'signUp' ? 'signUp' : 'signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');

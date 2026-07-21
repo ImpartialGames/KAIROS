@@ -29,7 +29,10 @@ export function AccountOfferBanner({ onDismiss }: { onDismiss: () => void }) {
 
       <Text className="font-serif text-sm leading-5 text-content-muted">{t('offerBody')}</Text>
 
-      <PressableScale onPress={() => router.push('/account')} accessibilityLabel={t('offerCta')}>
+      <PressableScale
+        onPress={() => router.push({ pathname: '/account', params: { mode: 'signUp' } })}
+        accessibilityLabel={t('offerCta')}
+      >
         <View className="items-center rounded-2xl bg-accent px-6 py-3 active:bg-accent-deep">
           <Text className="font-sans-bold text-sm text-background">{t('offerCta')}</Text>
         </View>

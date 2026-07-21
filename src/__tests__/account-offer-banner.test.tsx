@@ -18,7 +18,7 @@ describe('AccountOfferBanner', () => {
 
     expect(screen.getByText('Sauvegardez vos progrès')).toBeOnTheScreen();
     fireEvent.press(screen.getByLabelText('Créer un compte'));
-    expect(mockPush).toHaveBeenCalledWith('/account');
+    expect(mockPush).toHaveBeenCalledWith({ pathname: '/account', params: { mode: 'signUp' } });
   });
 
   it('peut être ignorée (non bloquante)', () => {
