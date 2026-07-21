@@ -44,4 +44,25 @@ describe('WellbeingInsights', () => {
     expect(screen.getByText('Clarté mentale')).toBeOnTheScreen();
     expect(screen.getByText('Faim')).toBeOnTheScreen();
   });
+
+  it('affiche un constat quand un ressenti se détache en jeûne profond', () => {
+    const correlation: WellbeingCorrelation = {
+      contextualEntries: 5,
+      bands: [
+        { fromHours: 0, entryCount: 2, averageMood: 2, tagFrequency: { ...zeroTags(), faim: 1 } },
+        {
+          fromHours: 18,
+          entryCount: 3,
+          averageMood: 4,
+          tagFrequency: { ...zeroTags(), clarte_mentale: 1 },
+        },
+      ],
+    };
+
+    render(<WellbeingInsights correlation={correlation} />);
+
+    expect(
+      screen.getByText('À partir de 18 h de jeûne, vous notez souvent : Clarté mentale.'),
+    ).toBeOnTheScreen();
+  });
 });

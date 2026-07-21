@@ -9,7 +9,7 @@ import { GlassCard } from '@/components/ui/glass-card';
 import { PressableScale } from '@/components/ui/pressable-scale';
 import { WellbeingInsights } from '@/components/journal/wellbeing-insights';
 import { buildJournalFeed } from '@/domain/journal-feed';
-import { buildWellbeingCorrelation } from '@/domain/wellbeing-correlation';
+import { buildWellbeingCorrelation, elapsedFastingHours } from '@/domain/wellbeing-correlation';
 import type { FastSession } from '@/schemas/fast-session';
 import { RESSENTI_TAGS, type JournalEntry, type RessentiTag } from '@/schemas/journal-entry';
 import { journalStore, useJournalStore } from '@/stores/journal-store';
@@ -20,6 +20,10 @@ const MOOD_SCALE = [1, 2, 3, 4, 5] as const;
 
 function formatDate(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+function formatTime(timestamp: number): string {
+  return new Date(timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function durationParts(ms: number): { hours: number; minutes: number } {
@@ -190,8 +194,22 @@ function SessionCard({ session, phases }: { session: FastSession; phases: number
   );
 }
 
-function EntryCard({ entry }: { entry: JournalEntry }) {
+function EntryCard({
+  entry,
+  fastingHours,
+}: {
+  entry: JournalEntry;
+  /** Heures de jeûne écoulées à la saisie (null si la note n'était pas en jeûne). */
+  fastingHours: number | null;
+}) {
   const { t } = useTranslation('journal');
+  const fastingLabel =
+    fastingHours === null
+      ? null
+      : fastingHours < 1
+        ? t('entryFastingStart')
+        : t('entryFastingContext', { hours: fastingHours });
+
   return (
     <GlassCard contentClassName="gap-3 p-5">
       <View className="flex-row items-center justify-between">
@@ -199,8 +217,16 @@ function EntryCard({ entry }: { entry: JournalEntry }) {
           <Ionicons name="create-outline" size={16} color={colors.accent} />
           <Text className="font-sans-medium text-sm text-content">{t('noteTitle')}</Text>
         </View>
-        <Text className="font-sans text-xs text-content-faint">{formatDate(entry.createdAt)}</Text>
+        <Text className="font-sans text-xs text-content-faint">
+          {t('entryDateTime', { date: formatDate(entry.createdAt), time: formatTime(entry.createdAt) })}
+        </Text>
       </View>
+      {fastingLabel !== null && (
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons name="time-outline" size={14} color={colors.accentBright} />
+          <Text className="font-sans-medium text-xs text-accent-bright">{fastingLabel}</Text>
+        </View>
+      )}
       {entry.mood !== null && <MoodDots value={entry.mood} />}
       {entry.tags.length > 0 && <TagChips tags={entry.tags} />}
       {entry.note !== null && (
@@ -233,6 +259,13 @@ export default function JournalScreen() {
     () => buildWellbeingCorrelation(sessions, entries),
     [sessions, entries],
   );
+  const sessionsById = useMemo(() => new Map(sessions.map((s) => [s.id, s])), [sessions]);
+
+  /** Heures de jeûne écoulées à la saisie d'une note, si elle était rattachée à un jeûne connu. */
+  const fastingHoursFor = (entry: JournalEntry): number | null => {
+    const session = entry.sessionId ? sessionsById.get(entry.sessionId) : undefined;
+    return session ? elapsedFastingHours(session.startedAt, entry.createdAt) : null;
+  };
 
   const trimmedNote = note.trim();
   const canSave = mood !== null || tags.length > 0 || trimmedNote.length > 0;
@@ -321,7 +354,11 @@ export default function JournalScreen() {
                   phases={phasesBySession[item.session.id] ?? []}
                 />
               ) : (
-                <EntryCard key={`e-${item.entry.id}`} entry={item.entry} />
+                <EntryCard
+                  key={`e-${item.entry.id}`}
+                  entry={item.entry}
+                  fastingHours={fastingHoursFor(item.entry)}
+                />
               ),
             )
           )}

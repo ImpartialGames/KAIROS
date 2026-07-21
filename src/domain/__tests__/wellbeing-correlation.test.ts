@@ -2,6 +2,8 @@ import { HOUR_MS } from '@/domain/fasting';
 import {
   bandForElapsedHours,
   buildWellbeingCorrelation,
+  elapsedFastingHours,
+  headlineInsight,
 } from '@/domain/wellbeing-correlation';
 import type { FastSession } from '@/schemas/fast-session';
 import type { JournalEntry, RessentiTag } from '@/schemas/journal-entry';
@@ -118,5 +120,55 @@ describe('buildWellbeingCorrelation', () => {
 
   it('sans note contextualisée, la corrélation est vide', () => {
     expect(buildWellbeingCorrelation([], [])).toEqual({ bands: [], contextualEntries: 0 });
+  });
+});
+
+describe('elapsedFastingHours', () => {
+  it('rend les heures pleines écoulées', () => {
+    expect(elapsedFastingHours(T0, T0 + 18 * HOUR_MS + 40 * 60_000)).toBe(18);
+  });
+  it('borne à 0 une note antérieure au début', () => {
+    expect(elapsedFastingHours(T0, T0 - HOUR_MS)).toBe(0);
+  });
+});
+
+describe('headlineInsight', () => {
+  /** Construit une corrélation à partir de notes réparties par heure de jeûne. */
+  const correlationFrom = (notes: { hours: number; tags: RessentiTag[] }[]) =>
+    buildWellbeingCorrelation(
+      [session()],
+      notes.map((n) => noteAtHours(n.hours, null, n.tags)),
+    );
+
+  it('null tant qu’il n’y a pas assez de notes tardives', () => {
+    const c = correlationFrom([
+      { hours: 20, tags: ['clarte_mentale'] },
+      { hours: 21, tags: ['clarte_mentale'] },
+    ]);
+    expect(headlineInsight(c)).toBeNull();
+  });
+
+  it('détecte un ressenti nettement plus fréquent en jeûne profond', () => {
+    const c = correlationFrom([
+      { hours: 2, tags: ['faim'] },
+      { hours: 4, tags: ['faim'] },
+      { hours: 19, tags: ['clarte_mentale'] },
+      { hours: 20, tags: ['clarte_mentale'] },
+      { hours: 22, tags: ['clarte_mentale'] },
+    ]);
+    const insight = headlineInsight(c);
+    expect(insight?.tag).toBe('clarte_mentale');
+    expect(insight?.fromHours).toBe(18);
+  });
+
+  it('null si aucun ressenti ne se détache (fréquences trop proches)', () => {
+    const c = correlationFrom([
+      { hours: 2, tags: ['clarte_mentale'] },
+      { hours: 4, tags: ['clarte_mentale'] },
+      { hours: 19, tags: ['clarte_mentale'] },
+      { hours: 20, tags: ['clarte_mentale'] },
+      { hours: 22, tags: ['clarte_mentale'] },
+    ]);
+    expect(headlineInsight(c)).toBeNull();
   });
 });

@@ -28,5 +28,9 @@
   "insightsNoMood": "Humeur non notée",
   "insightsEntries_one": "{{count}} note",
   "insightsEntries_other": "{{count}} notes",
-  "insightsTagShare": "{{percent}} %"
+  "insightsTagShare": "{{percent}} %",
+  "insightHeadline": "À partir de {{hours}} h de jeûne, vous notez souvent : {{ressenti}}.",
+  "entryDateTime": "{{date}} · {{time}}",
+  "entryFastingContext": "à {{hours}} h de jeûne",
+  "entryFastingStart": "en début de jeûne"
 }

@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
+import { Ionicons } from '@expo/vector-icons';
+
 import { GlassCard } from '@/components/ui/glass-card';
-import type { PhaseBand, WellbeingCorrelation } from '@/domain/wellbeing-correlation';
+import {
+  headlineInsight,
+  type PhaseBand,
+  type WellbeingCorrelation,
+} from '@/domain/wellbeing-correlation';
 import { MOOD_MAX, type RessentiTag } from '@/schemas/journal-entry';
 import { colors } from '@/theme/tokens';
 import { Text, View } from '@/tw';
@@ -82,6 +88,7 @@ export function WellbeingInsights({ correlation }: { correlation: WellbeingCorre
   if (correlation.contextualEntries === 0) {
     return null;
   }
+  const headline = headlineInsight(correlation);
 
   return (
     <GlassCard elevated contentClassName="gap-3 p-5">
@@ -91,6 +98,19 @@ export function WellbeingInsights({ correlation }: { correlation: WellbeingCorre
           {t('insightsSubtitle')}
         </Text>
       </View>
+
+      {headline !== null && (
+        <View className="flex-row items-start gap-2 rounded-2xl border border-accent-deep bg-surface p-3">
+          <Ionicons name="sparkles-outline" size={16} color={colors.accentBright} />
+          <Text className="flex-1 font-serif text-sm leading-5 text-accent-bright">
+            {t('insightHeadline', {
+              hours: headline.fromHours,
+              ressenti: t(`tag_${headline.tag}`),
+            })}
+          </Text>
+        </View>
+      )}
+
       {correlation.bands.map((band) => (
         <BandRow key={band.fromHours} band={band} />
       ))}

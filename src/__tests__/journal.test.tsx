@@ -124,4 +124,36 @@ describe('JournalScreen', () => {
 
     jest.useRealTimers();
   });
+
+  it('situe une note prise pendant un jeûne (« à N h de jeûne »)', () => {
+    jest.useFakeTimers({ now: NOW });
+    const session: FastSession = {
+      id: 'sess-2',
+      userId: 'u',
+      protocol: 'custom',
+      targetHours: 24,
+      status: 'completed',
+      startedAt: NOW - 2 * 86_400_000,
+      endedAt: NOW - 2 * 86_400_000 + 24 * 3_600_000,
+      createdAt: NOW,
+      updatedAt: NOW,
+    };
+    const entry: JournalEntry = {
+      id: 'entry-2',
+      userId: 'u',
+      sessionId: 'sess-2',
+      mood: null,
+      tags: ['clarte_mentale'],
+      note: null,
+      // 18 h après le début de la session.
+      createdAt: NOW - 2 * 86_400_000 + 18 * 3_600_000,
+      updatedAt: NOW - 2 * 86_400_000 + 18 * 3_600_000,
+    };
+    resetStore({ sessions: [session], entries: [entry] });
+
+    render(<JournalScreen />);
+
+    expect(screen.getByText('à 18 h de jeûne')).toBeOnTheScreen();
+    jest.useRealTimers();
+  });
 });
