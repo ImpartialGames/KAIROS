@@ -1,5 +1,5 @@
 import { FakeAuthClient } from '@/auth/testing/fake-auth-client';
-import { createAuthStore } from '@/stores/auth-store';
+import { AUTH_UNEXPECTED_ERROR, createAuthStore } from '@/stores/auth-store';
 
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
@@ -98,6 +98,48 @@ describe('auth-store', () => {
     expect(store.getState().error).not.toBeNull();
     store.getState().clearError();
     expect(store.getState().error).toBeNull();
+  });
+
+  describe('erreurs imprévues (le client lève au lieu de retourner)', () => {
+    it('signUp : l’erreur est remontée à l’utilisateur, jamais avalée', async () => {
+      const fake = new FakeAuthClient({ requireConfirmation: true });
+      // Simule un throw (env Supabase absent, coupure réseau, storage…).
+      fake.signUp = async () => {
+        throw new Error('Network request failed');
+      };
+      const store = createAuthStore(() => fake);
+      store.getState().init();
+
+      await store.getState().signUp('a@b.co', 'motdepasse');
+
+      expect(store.getState().error).toBe('Network request failed');
+      expect(store.getState().status).not.toBe('awaitingConfirmation');
+    });
+
+    it('signIn : un throw sans message retombe sur un message générique', async () => {
+      const fake = new FakeAuthClient({ requireConfirmation: false });
+      fake.signIn = async () => {
+        throw 'boom';
+      };
+      const store = createAuthStore(() => fake);
+      store.getState().init();
+
+      await store.getState().signIn('a@b.co', 'motdepasse');
+
+      expect(store.getState().error).toBe(AUTH_UNEXPECTED_ERROR);
+    });
+
+    it('requestPasswordReset : un throw renvoie false et remonte l’erreur', async () => {
+      const fake = new FakeAuthClient({ requireConfirmation: false });
+      fake.requestPasswordReset = async () => {
+        throw new Error('injoignable');
+      };
+      const store = createAuthStore(() => fake);
+      store.getState().init();
+
+      await expect(store.getState().requestPasswordReset('a@b.co')).resolves.toBe(false);
+      expect(store.getState().error).toBe('injoignable');
+    });
   });
 
   describe('liens profonds (deep-link)', () => {

@@ -14,6 +14,14 @@ export type AuthStatus =
   | 'signedIn'
   | 'recovering';
 
+/** Repli quand une action d'auth LÈVE (env absent, réseau, storage) sans message. */
+export const AUTH_UNEXPECTED_ERROR =
+  'Une erreur inattendue est survenue. Vérifiez votre connexion, puis réessayez.';
+
+/** Message lisible d'une exception : les actions ne doivent jamais échouer en silence. */
+const toErrorMessage = (error: unknown): string =>
+  error instanceof Error && error.message ? error.message : AUTH_UNEXPECTED_ERROR;
+
 export interface AuthState {
   status: AuthStatus;
   user: AuthUser | null;
@@ -56,63 +64,91 @@ export function createAuthStore(getAuthClient: () => AuthClient) {
           set({ status: 'signedOut', user: null });
         }
       });
-      void client.getSession().then((session) => {
-        // Ne pas écraser un état déjà fixé par un événement concurrent.
-        if (get().status !== 'loading') {
-          return;
-        }
-        set(
-          session
-            ? { status: 'signedIn', user: session.user }
-            : { status: 'signedOut', user: null },
-        );
-      });
+      void client
+        .getSession()
+        .then((session) => {
+          // Ne pas écraser un état déjà fixé par un événement concurrent.
+          if (get().status !== 'loading') {
+            return;
+          }
+          set(
+            session
+              ? { status: 'signedIn', user: session.user }
+              : { status: 'signedOut', user: null },
+          );
+        })
+        .catch(() => {
+          // Échec de restauration de session : on n'y reste pas bloqué sur 'loading',
+          // l'écran compte reste utilisable (connexion/inscription).
+          if (get().status === 'loading') {
+            set({ status: 'signedOut', user: null });
+          }
+        });
       return unsubscribe;
     },
 
     async signUp(email, password) {
       set({ error: null });
-      const outcome = await auth().signUp(email, password);
-      if (outcome.errorMessage) {
-        set({ error: outcome.errorMessage });
-        return;
-      }
-      if (outcome.session) {
-        set({ status: 'signedIn', user: outcome.session.user, pendingEmail: null });
-      } else {
-        set({ status: 'awaitingConfirmation', pendingEmail: email });
+      try {
+        const outcome = await auth().signUp(email, password);
+        if (outcome.errorMessage) {
+          set({ error: outcome.errorMessage });
+          return;
+        }
+        if (outcome.session) {
+          set({ status: 'signedIn', user: outcome.session.user, pendingEmail: null });
+        } else {
+          set({ status: 'awaitingConfirmation', pendingEmail: email });
+        }
+      } catch (error) {
+        // Un throw (env Supabase absent, réseau, storage) ne doit jamais laisser
+        // l'écran muet : on le remonte comme n'importe quelle erreur d'auth.
+        set({ error: toErrorMessage(error) });
       }
     },
 
     async signIn(email, password) {
       set({ error: null });
-      const outcome = await auth().signIn(email, password);
-      if (outcome.errorMessage) {
-        set({ error: outcome.errorMessage });
-        return;
-      }
-      if (outcome.session) {
-        set({ status: 'signedIn', user: outcome.session.user, pendingEmail: null });
+      try {
+        const outcome = await auth().signIn(email, password);
+        if (outcome.errorMessage) {
+          set({ error: outcome.errorMessage });
+          return;
+        }
+        if (outcome.session) {
+          set({ status: 'signedIn', user: outcome.session.user, pendingEmail: null });
+        }
+      } catch (error) {
+        set({ error: toErrorMessage(error) });
       }
     },
 
     async signOut() {
-      const { errorMessage } = await auth().signOut();
-      if (errorMessage) {
-        set({ error: errorMessage });
-        return;
+      try {
+        const { errorMessage } = await auth().signOut();
+        if (errorMessage) {
+          set({ error: errorMessage });
+          return;
+        }
+        set({ status: 'signedOut', user: null, pendingEmail: null });
+      } catch (error) {
+        set({ error: toErrorMessage(error) });
       }
-      set({ status: 'signedOut', user: null, pendingEmail: null });
     },
 
     async requestPasswordReset(email) {
       set({ error: null });
-      const { errorMessage } = await auth().requestPasswordReset(email);
-      if (errorMessage) {
-        set({ error: errorMessage });
+      try {
+        const { errorMessage } = await auth().requestPasswordReset(email);
+        if (errorMessage) {
+          set({ error: errorMessage });
+          return false;
+        }
+        return true;
+      } catch (error) {
+        set({ error: toErrorMessage(error) });
         return false;
       }
-      return true;
     },
 
     async handleAuthDeepLink(url) {
@@ -124,22 +160,31 @@ export function createAuthStore(getAuthClient: () => AuthClient) {
       if (!code) {
         return;
       }
-      // L'échange déclenche onAuthStateChange (→ signedIn ou recovering).
-      const outcome = await auth().exchangeCodeForSession(code);
-      if (outcome.errorMessage) {
-        set({ error: outcome.errorMessage });
+      try {
+        // L'échange déclenche onAuthStateChange (→ signedIn ou recovering).
+        const outcome = await auth().exchangeCodeForSession(code);
+        if (outcome.errorMessage) {
+          set({ error: outcome.errorMessage });
+        }
+      } catch (error) {
+        set({ error: toErrorMessage(error) });
       }
     },
 
     async updatePassword(newPassword) {
       set({ error: null });
-      const { errorMessage } = await auth().updatePassword(newPassword);
-      if (errorMessage) {
-        set({ error: errorMessage });
+      try {
+        const { errorMessage } = await auth().updatePassword(newPassword);
+        if (errorMessage) {
+          set({ error: errorMessage });
+          return false;
+        }
+        set({ status: 'signedIn' });
+        return true;
+      } catch (error) {
+        set({ error: toErrorMessage(error) });
         return false;
       }
-      set({ status: 'signedIn' });
-      return true;
     },
 
     clearError() {
