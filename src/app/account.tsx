@@ -85,10 +85,12 @@ export default function AccountScreen() {
   const signUp = useAuthStore((s) => s.signUp);
   const signOut = useAuthStore((s) => s.signOut);
   const requestPasswordReset = useAuthStore((s) => s.requestPasswordReset);
+  const updatePassword = useAuthStore((s) => s.updatePassword);
 
   const [mode, setMode] = useState<Mode>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
@@ -131,7 +133,28 @@ export default function AccountScreen() {
         </View>
 
         <ScrollView className="flex-1" contentContainerClassName="gap-5 px-6 pb-12 pt-2">
-          {status === 'signedIn' && user ? (
+          {status === 'recovering' ? (
+            <GlassCard elevated contentClassName="gap-4 p-5">
+              <View className="flex-row items-center gap-3">
+                <Ionicons name="key-outline" size={22} color={colors.accent} />
+                <Text className="font-serif-semibold text-lg text-content">
+                  {t('recoveringTitle')}
+                </Text>
+              </View>
+              <Field
+                label={t('newPassword')}
+                value={newPassword}
+                onChangeText={setNewPassword}
+                secure
+              />
+              {error && <Text className="font-sans text-sm text-danger">{error}</Text>}
+              <PrimaryButton
+                label={t('savePassword')}
+                onPress={() => void run(() => updatePassword(newPassword))}
+                disabled={busy || newPassword.length === 0}
+              />
+            </GlassCard>
+          ) : status === 'signedIn' && user ? (
             <GlassCard elevated contentClassName="gap-4 p-5">
               <View className="flex-row items-center gap-3">
                 <Ionicons name="checkmark-circle" size={22} color={colors.accent} />

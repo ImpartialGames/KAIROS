@@ -21,5 +21,8 @@
   "offerTitle": "Sauvegardez vos progrès",
   "offerBody": "Créez un compte gratuit pour ne rien perdre et retrouver vos données sur tous vos appareils.",
   "offerCta": "Créer un compte",
-  "offerDismiss": "Plus tard"
+  "offerDismiss": "Plus tard",
+  "recoveringTitle": "Choisir un nouveau mot de passe",
+  "newPassword": "Nouveau mot de passe",
+  "savePassword": "Enregistrer le mot de passe"
 }

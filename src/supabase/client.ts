@@ -21,6 +21,8 @@ export function getSupabase(): SupabaseClient {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: false,
+        // PKCE : les liens email renvoient un `code` échangé contre une session.
+        flowType: 'pkce',
       },
     });
   }

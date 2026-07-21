@@ -8,6 +8,7 @@ import {
   SpaceGrotesk_700Bold,
 } from '@expo-google-fonts/space-grotesk';
 import { useFonts } from 'expo-font';
+import * as Linking from 'expo-linking';
 import { Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -40,6 +41,8 @@ export default function RootLayout() {
   const appStatus = useAppStore((state) => state.status);
   const authStatus = useAuthStore((state) => state.status);
   const authUserId = useAuthStore((state) => state.user?.id ?? null);
+  // Lien profond qui a (r)ouvert l'app : confirmation email ou reset Supabase.
+  const deepLink = Linking.useURL();
 
   useEffect(() => {
     // Premier lancement : ouvre la base et crée/recharge l'invité (mode invité, CLAUDE.md).
@@ -73,6 +76,13 @@ export default function RootLayout() {
       void runGuestMigrationOnSignIn(authUserId).catch(() => undefined);
     }
   }, [appStatus, authStatus, authUserId]);
+
+  useEffect(() => {
+    // Lien email cliqué : échange le code contre une session (confirmation/reset).
+    if (deepLink) {
+      void authStore.getState().handleAuthDeepLink(deepLink);
+    }
+  }, [deepLink]);
 
   const fontsReady = fontsLoaded || fontError !== null;
   // Le splash se retire dès qu'on a quelque chose à montrer : l'app OU l'écran d'erreur.

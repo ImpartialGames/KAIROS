@@ -1,11 +1,18 @@
+import * as Linking from 'expo-linking';
 import { useStore } from 'zustand';
 import { createStore } from 'zustand/vanilla';
 
 import type { AuthClient, AuthUser } from '@/auth/auth-client';
+import { parseAuthLink } from '@/auth/deep-link';
 import { createSupabaseAuthClient } from '@/auth/supabase-auth-client';
 import { getSupabase } from '@/supabase/client';
 
-export type AuthStatus = 'loading' | 'signedOut' | 'awaitingConfirmation' | 'signedIn';
+export type AuthStatus =
+  | 'loading'
+  | 'signedOut'
+  | 'awaitingConfirmation'
+  | 'signedIn'
+  | 'recovering';
 
 export interface AuthState {
   status: AuthStatus;
@@ -20,6 +27,10 @@ export interface AuthState {
   signOut(): Promise<void>;
   /** Déclenche l'email de reset ; retourne true si l'envoi n'a pas échoué. */
   requestPasswordReset(email: string): Promise<boolean>;
+  /** Traite un lien profond d'auth (confirmation / reset) : échange le code. */
+  handleAuthDeepLink(url: string): Promise<void>;
+  /** Définit un nouveau mot de passe (fin du flux de récupération). */
+  updatePassword(newPassword: string): Promise<boolean>;
   clearError(): void;
 }
 
@@ -36,8 +47,10 @@ export function createAuthStore(getAuthClient: () => AuthClient) {
 
     init() {
       const client = auth();
-      const unsubscribe = client.onAuthStateChange((session) => {
-        if (session) {
+      const unsubscribe = client.onAuthStateChange((session, event) => {
+        if (event === 'passwordRecovery' && session) {
+          set({ status: 'recovering', user: session.user, pendingEmail: null, error: null });
+        } else if (session) {
           set({ status: 'signedIn', user: session.user, pendingEmail: null, error: null });
         } else if (get().status !== 'awaitingConfirmation') {
           set({ status: 'signedOut', user: null });
@@ -102,14 +115,44 @@ export function createAuthStore(getAuthClient: () => AuthClient) {
       return true;
     },
 
+    async handleAuthDeepLink(url) {
+      const { code, errorMessage } = parseAuthLink(url);
+      if (errorMessage) {
+        set({ error: errorMessage });
+        return;
+      }
+      if (!code) {
+        return;
+      }
+      // L'échange déclenche onAuthStateChange (→ signedIn ou recovering).
+      const outcome = await auth().exchangeCodeForSession(code);
+      if (outcome.errorMessage) {
+        set({ error: outcome.errorMessage });
+      }
+    },
+
+    async updatePassword(newPassword) {
+      set({ error: null });
+      const { errorMessage } = await auth().updatePassword(newPassword);
+      if (errorMessage) {
+        set({ error: errorMessage });
+        return false;
+      }
+      set({ status: 'signedIn' });
+      return true;
+    },
+
     clearError() {
       set({ error: null });
     },
   }));
 }
 
-/** Store d'auth unique (production) — les tests créent le leur avec un faux client. */
-export const authStore = createAuthStore(() => createSupabaseAuthClient(getSupabase()));
+/** Store d'auth unique (production) — les tests créent le leur avec un faux client.
+ *  Redirection deep-link résolue à la demande (kairos://) pour les emails Supabase. */
+export const authStore = createAuthStore(() =>
+  createSupabaseAuthClient(getSupabase(), { redirectTo: Linking.createURL('') }),
+);
 
 export function useAuthStore<T>(selector: (state: AuthState) => T): T {
   return useStore(authStore, selector);

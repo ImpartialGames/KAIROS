@@ -20,6 +20,7 @@ const setAuth = (over: Partial<AuthState>) => {
     signUp: jest.fn(async () => undefined),
     signOut: jest.fn(async () => undefined),
     requestPasswordReset: jest.fn(async () => true),
+    updatePassword: jest.fn(async () => true),
     ...over,
   });
 };
@@ -84,6 +85,18 @@ describe('AccountScreen', () => {
 
     expect(screen.getByText('Vérifiez vos emails')).toBeOnTheScreen();
     expect(screen.getByText(/a@b\.co/)).toBeOnTheScreen();
+  });
+
+  it('récupération : saisie d’un nouveau mot de passe et enregistrement', async () => {
+    const updatePassword = jest.fn(async () => true);
+    setAuth({ status: 'recovering', updatePassword });
+    render(<AccountScreen />);
+
+    expect(screen.getByText('Choisir un nouveau mot de passe')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('Nouveau mot de passe'), 'nouveau-secret');
+    fireEvent.press(screen.getByText('Enregistrer le mot de passe'));
+
+    await waitFor(() => expect(updatePassword).toHaveBeenCalledWith('nouveau-secret'));
   });
 
   it('connecté : email, message de synchro, déconnexion', () => {

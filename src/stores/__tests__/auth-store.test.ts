@@ -99,4 +99,49 @@ describe('auth-store', () => {
     store.getState().clearError();
     expect(store.getState().error).toBeNull();
   });
+
+  describe('liens profonds (deep-link)', () => {
+    it('confirmation : le lien email connecte l’utilisateur', async () => {
+      const fake = new FakeAuthClient({ requireConfirmation: true });
+      const store = createAuthStore(() => fake);
+      store.getState().init();
+      await store.getState().signUp('a@b.co', 'motdepasse');
+
+      const code = fake.confirmationCode('a@b.co');
+      await store.getState().handleAuthDeepLink(`kairos://auth?code=${code}`);
+
+      expect(store.getState().status).toBe('signedIn');
+      expect(store.getState().user?.email).toBe('a@b.co');
+    });
+
+    it('récupération : le lien met en état recovering, puis updatePassword reconnecte', async () => {
+      const fake = new FakeAuthClient({ requireConfirmation: false });
+      const store = createAuthStore(() => fake);
+      store.getState().init();
+      await store.getState().signUp('a@b.co', 'ancien');
+      await store.getState().signOut();
+
+      await store.getState().requestPasswordReset('a@b.co');
+      const code = fake.recoveryCode('a@b.co');
+      await store.getState().handleAuthDeepLink(`kairos://auth?code=${code}`);
+      expect(store.getState().status).toBe('recovering');
+
+      const ok = await store.getState().updatePassword('nouveau');
+      expect(ok).toBe(true);
+      expect(store.getState().status).toBe('signedIn');
+    });
+
+    it('lien en erreur : message d’erreur, pas de session', async () => {
+      const fake = new FakeAuthClient({ requireConfirmation: false });
+      const store = createAuthStore(() => fake);
+      store.getState().init();
+
+      await store
+        .getState()
+        .handleAuthDeepLink('kairos://auth?error=access_denied&error_description=Lien+expiré');
+
+      expect(store.getState().error).toMatch(/expiré/);
+      expect(store.getState().status).not.toBe('signedIn');
+    });
+  });
 });
