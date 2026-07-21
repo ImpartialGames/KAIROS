@@ -7,7 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AmbientBackground } from '@/components/ui/ambient-background';
 import { GlassCard } from '@/components/ui/glass-card';
 import { PressableScale } from '@/components/ui/pressable-scale';
+import { WellbeingInsights } from '@/components/journal/wellbeing-insights';
 import { buildJournalFeed } from '@/domain/journal-feed';
+import { buildWellbeingCorrelation } from '@/domain/wellbeing-correlation';
 import type { FastSession } from '@/schemas/fast-session';
 import { RESSENTI_TAGS, type JournalEntry, type RessentiTag } from '@/schemas/journal-entry';
 import { journalStore, useJournalStore } from '@/stores/journal-store';
@@ -227,6 +229,10 @@ export default function JournalScreen() {
   }, []);
 
   const feed = useMemo(() => buildJournalFeed(sessions, entries, now), [sessions, entries, now]);
+  const correlation = useMemo(
+    () => buildWellbeingCorrelation(sessions, entries),
+    [sessions, entries],
+  );
 
   const trimmedNote = note.trim();
   const canSave = mood !== null || tags.length > 0 || trimmedNote.length > 0;
@@ -299,6 +305,8 @@ export default function JournalScreen() {
               </View>
             </PressableScale>
           </GlassCard>
+
+          <WellbeingInsights correlation={correlation} />
 
           {feed.length === 0 ? (
             <Text className="py-6 text-center font-serif text-base leading-6 text-content-faint">

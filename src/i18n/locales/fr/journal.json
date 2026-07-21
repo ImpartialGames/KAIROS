@@ -19,5 +19,14 @@
   "sessionCancelled": "Jeûne abandonné",
   "duration": "{{hours}} h {{minutes}} min",
   "phasesReached": "Paliers atteints",
-  "noteTitle": "Note"
+  "noteTitle": "Note",
+  "insightsTitle": "Bien-être selon la phase",
+  "insightsSubtitle": "Vos ressentis situés dans le jeûne, sur 30 jours.",
+  "insightsBandBefore": "Avant 12 h",
+  "insightsBandFrom": "Dès {{hours}} h",
+  "insightsMood": "Humeur {{value}}/5",
+  "insightsNoMood": "Humeur non notée",
+  "insightsEntries_one": "{{count}} note",
+  "insightsEntries_other": "{{count}} notes",
+  "insightsTagShare": "{{percent}} %"
 }
