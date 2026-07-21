@@ -11,4 +11,9 @@ export interface UserRepository {
   getCurrent(): Promise<User | null>;
   /** Enregistre l'acceptation de l'écran précautions (avant le premier jeûne). */
   acknowledgePrecautions(userId: string, acknowledgedAt: number): Promise<User>;
+  /**
+   * Convertit l'invité en inscrit EN PLACE (is_guest=0, lien vers le compte
+   * Supabase) — jamais recréé, aucune donnée locale déplacée (Phase 1, critique).
+   */
+  convertGuestToRegistered(userId: string, authUserId: string): Promise<User>;
 }

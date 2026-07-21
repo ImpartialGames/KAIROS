@@ -23,6 +23,7 @@ describe('SqliteUserRepository', () => {
   it('getOrCreateGuest crée un invité au premier appel', async () => {
     const user = await repos.users.getOrCreateGuest();
     expect(user.isGuest).toBe(true);
+    expect(user.authUserId).toBeNull();
     expect(user.createdAt).toBeGreaterThan(0);
     expect(user.updatedAt).toBe(user.createdAt);
   });
@@ -58,6 +59,32 @@ describe('SqliteUserRepository', () => {
   it('acknowledgePrecautions échoue sur un utilisateur inconnu', async () => {
     await expect(
       repos.users.acknowledgePrecautions('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e', 1_700_000_000_000),
+    ).rejects.toThrow(USER_NOT_FOUND_ERROR);
+  });
+
+  it('convertGuestToRegistered met à jour EN PLACE (même id, is_guest=0, lien compte)', async () => {
+    const guest = await repos.users.getOrCreateGuest();
+    const authUserId = 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e';
+
+    const converted = await repos.users.convertGuestToRegistered(guest.id, authUserId);
+
+    expect(converted.id).toBe(guest.id); // même enregistrement
+    expect(converted.isGuest).toBe(false);
+    expect(converted.authUserId).toBe(authUserId);
+
+    // Persisté, et toujours un seul enregistrement (rien recréé).
+    const reread = await repos.users.getCurrent();
+    expect(reread?.isGuest).toBe(false);
+    const count = await db.getFirstAsync<{ n: number }>('SELECT COUNT(*) AS n FROM users');
+    expect(count?.n).toBe(1);
+  });
+
+  it('convertGuestToRegistered échoue sur un utilisateur inconnu', async () => {
+    await expect(
+      repos.users.convertGuestToRegistered(
+        'c3d4e5f6-a7b8-4c9d-8e0f-2a3b4c5d6e7f',
+        'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e',
+      ),
     ).rejects.toThrow(USER_NOT_FOUND_ERROR);
   });
 });

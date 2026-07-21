@@ -61,6 +61,13 @@ export const MIGRATIONS: readonly string[] = [
   `
   ALTER TABLE users ADD COLUMN precautions_acknowledged_at INTEGER;
   `,
+
+  // v3 — lien vers le compte Supabase à l'inscription (Phase 1). L'enregistrement
+  // invité est mis à jour EN PLACE (is_guest=0, auth_user_id renseigné) — jamais
+  // recréé, les données locales gardent leur user_id local (CLAUDE.md).
+  `
+  ALTER TABLE users ADD COLUMN auth_user_id TEXT;
+  `,
 ];
 
 export async function migrate(db: DbClient): Promise<void> {
