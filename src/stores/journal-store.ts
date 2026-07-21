@@ -4,7 +4,7 @@ import { createStore } from 'zustand/vanilla';
 import { JOURNAL_WINDOW_DAYS } from '@/domain/journal-feed';
 import type { Repositories } from '@/repositories';
 import type { FastSession } from '@/schemas/fast-session';
-import type { JournalEntry } from '@/schemas/journal-entry';
+import type { JournalEntry, RessentiTag } from '@/schemas/journal-entry';
 import type { User } from '@/schemas/user';
 import { appStore } from '@/stores/app-store';
 
@@ -15,6 +15,7 @@ const ENTRY_FETCH_LIMIT = 200;
 
 export interface NewJournalEntry {
   mood: number | null;
+  tags: RessentiTag[];
   note: string | null;
 }
 
@@ -73,10 +74,15 @@ export function createJournalStore({ getApp, now = Date.now }: JournalStoreDeps)
 
     async addEntry(input) {
       const { repositories, user } = requireApp();
+      // Rattache la saisie au jeûne en cours s'il y en a un : c'est ce lien qui
+      // permet, plus tard, de situer le ressenti dans la phase biochimique
+      // (heures écoulées = createdAt − session.startedAt). Hors jeûne : null.
+      const active = await repositories.fastSessions.getActive(user.id);
       const entry = await repositories.journal.create({
         userId: user.id,
-        sessionId: null,
+        sessionId: active?.id ?? null,
         mood: input.mood,
+        tags: input.tags,
         note: input.note,
       });
       set({ entries: [entry, ...get().entries] });

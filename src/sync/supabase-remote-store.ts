@@ -28,6 +28,8 @@ interface JournalRow {
   user_id: string;
   session_id: string | null;
   mood: number | null;
+  /** Ressentis (Phase 2) : colonne jsonb côté cloud → tableau natif ici. */
+  tags: string[];
   note: string | null;
   created_at: number;
   updated_at: number;
@@ -82,6 +84,7 @@ const fromEntry = (e: JournalEntry): JournalRow => ({
   user_id: e.userId,
   session_id: e.sessionId,
   mood: e.mood,
+  tags: e.tags,
   note: e.note,
   created_at: e.createdAt,
   updated_at: e.updatedAt,
@@ -92,6 +95,8 @@ const toEntry = (r: JournalRow): JournalEntry =>
     userId: r.user_id,
     sessionId: r.session_id,
     mood: r.mood,
+    // Une ligne cloud d'avant la migration tags peut renvoyer null → [].
+    tags: r.tags ?? [],
     note: r.note,
     createdAt: r.created_at,
     updatedAt: r.updated_at,

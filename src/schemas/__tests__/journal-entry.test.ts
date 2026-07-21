@@ -27,6 +27,25 @@ describe('JournalEntrySchema', () => {
     expect(JournalEntrySchema.safeParse({ ...valid(), mood: null }).success).toBe(true);
   });
 
+  it('défaut tags = [] quand le champ est absent', () => {
+    const result = JournalEntrySchema.safeParse(valid());
+    expect(result.success && result.data.tags).toEqual([]);
+  });
+
+  it('accepte une entrée avec des ressentis seuls (ni humeur ni note)', () => {
+    const result = JournalEntrySchema.safeParse({
+      ...valid(),
+      mood: null,
+      note: null,
+      tags: ['clarte_mentale', 'energie'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejette un ressenti hors vocabulaire', () => {
+    expect(JournalEntrySchema.safeParse({ ...valid(), tags: ['inconnu'] }).success).toBe(false);
+  });
+
   it.each([
     ['id non uuid', { id: 'x' }],
     ['userId non uuid', { userId: 'x' }],
@@ -53,11 +72,19 @@ describe('CreateJournalEntryInputSchema', () => {
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data).toMatchObject({ sessionId: null, mood: null, note: 'du texte' });
+      expect(result.data).toMatchObject({ sessionId: null, mood: null, note: 'du texte', tags: [] });
     }
   });
 
-  it('rejette une entrée sans humeur ni note', () => {
+  it('accepte des ressentis seuls (sans humeur ni note)', () => {
+    const result = CreateJournalEntryInputSchema.safeParse({
+      userId: USER_ID,
+      tags: ['serenite'],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejette une entrée sans humeur, ni note, ni ressenti', () => {
     expect(CreateJournalEntryInputSchema.safeParse({ userId: USER_ID }).success).toBe(false);
   });
 });

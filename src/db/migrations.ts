@@ -68,6 +68,32 @@ export const MIGRATIONS: readonly string[] = [
   `
   ALTER TABLE users ADD COLUMN auth_user_id TEXT;
   `,
+
+  // v4 — ressentis du journal (Phase 2, bien-être approfondi). Tableau JSON de
+  // clés du vocabulaire contrôlé (RESSENTI_TAGS), base de la corrélation
+  // ressenti ↔ phase biochimique. Il faut à la fois AJOUTER la colonne tags et
+  // ASSOUPLIR le CHECK de contenu (une entrée peut ne porter que des ressentis).
+  // SQLite ne sait pas retirer une contrainte : on reconstruit la table et on
+  // recopie les lignes (tags initialisés à '[]').
+  `
+  CREATE TABLE journal_entries_v4 (
+    id TEXT PRIMARY KEY NOT NULL,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    session_id TEXT REFERENCES fast_sessions(id) ON DELETE SET NULL,
+    mood INTEGER CHECK (mood IS NULL OR (mood BETWEEN 1 AND 5)),
+    tags TEXT NOT NULL DEFAULT '[]',
+    note TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    CHECK (mood IS NOT NULL OR note IS NOT NULL OR json_array_length(tags) > 0)
+  );
+  INSERT INTO journal_entries_v4 (id, user_id, session_id, mood, tags, note, created_at, updated_at)
+    SELECT id, user_id, session_id, mood, '[]', note, created_at, updated_at FROM journal_entries;
+  DROP TABLE journal_entries;
+  ALTER TABLE journal_entries_v4 RENAME TO journal_entries;
+  CREATE INDEX idx_journal_entries_user_created
+    ON journal_entries(user_id, created_at DESC);
+  `,
 ];
 
 export async function migrate(db: DbClient): Promise<void> {

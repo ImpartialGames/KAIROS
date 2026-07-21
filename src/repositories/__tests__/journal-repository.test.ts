@@ -79,6 +79,25 @@ describe('SqliteJournalRepository', () => {
     expect(page.map((e) => e.id)).toEqual([first.id]);
   });
 
+  it('persiste et relit les ressentis (tags JSON)', async () => {
+    const created = await repos.journal.create({
+      userId,
+      tags: ['clarte_mentale', 'faim'],
+      note: 'Tête claire malgré la faim.',
+    });
+    expect(created.tags).toEqual(['clarte_mentale', 'faim']);
+
+    const reloaded = await repos.journal.getById(created.id);
+    expect(reloaded?.tags).toEqual(['clarte_mentale', 'faim']);
+  });
+
+  it('met à jour les ressentis sans toucher au reste', async () => {
+    const created = await repos.journal.create({ userId, mood: 3, tags: ['faim'] });
+    const updated = await repos.journal.update(created.id, { tags: ['energie', 'serenite'] });
+    expect(updated.tags).toEqual(['energie', 'serenite']);
+    expect(updated.mood).toBe(3);
+  });
+
   it('détache l’entrée de sa session supprimée (ON DELETE SET NULL)', async () => {
     const session = await repos.fastSessions.start({ userId, protocol: '16:8' });
     const entry = await repos.journal.create({

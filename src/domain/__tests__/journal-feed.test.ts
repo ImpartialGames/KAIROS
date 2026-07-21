@@ -24,6 +24,7 @@ const entry = (over: Partial<JournalEntry>): JournalEntry => ({
   userId: 'u',
   sessionId: null,
   mood: 4,
+  tags: [],
   note: 'ok',
   createdAt: NOW,
   updatedAt: NOW,

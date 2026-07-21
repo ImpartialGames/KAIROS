@@ -52,7 +52,11 @@ describe('JournalScreen', () => {
     fireEvent.press(screen.getByText('Enregistrer'));
 
     await waitFor(() =>
-      expect(addEntry).toHaveBeenCalledWith({ mood: null, note: 'Bien dormi, énergie stable.' }),
+      expect(addEntry).toHaveBeenCalledWith({
+        mood: null,
+        tags: [],
+        note: 'Bien dormi, énergie stable.',
+      }),
     );
   });
 
@@ -64,7 +68,25 @@ describe('JournalScreen', () => {
     fireEvent.press(screen.getByLabelText('Humeur 4 sur 5'));
     fireEvent.press(screen.getByText('Enregistrer'));
 
-    await waitFor(() => expect(addEntry).toHaveBeenCalledWith({ mood: 4, note: null }));
+    await waitFor(() => expect(addEntry).toHaveBeenCalledWith({ mood: 4, tags: [], note: null }));
+  });
+
+  it('enregistre des ressentis seuls (tags)', async () => {
+    const addEntry = jest.fn(async () => undefined);
+    resetStore({ addEntry });
+    render(<JournalScreen />);
+
+    fireEvent.press(screen.getByLabelText('Clarté mentale'));
+    fireEvent.press(screen.getByLabelText('Faim'));
+    fireEvent.press(screen.getByText('Enregistrer'));
+
+    await waitFor(() =>
+      expect(addEntry).toHaveBeenCalledWith({
+        mood: null,
+        tags: ['clarte_mentale', 'faim'],
+        note: null,
+      }),
+    );
   });
 
   it('rend le fil : session terminée avec paliers et note', () => {
@@ -86,6 +108,7 @@ describe('JournalScreen', () => {
       userId: 'u',
       sessionId: null,
       mood: 5,
+      tags: [],
       note: 'Clarté mentale nette.',
       createdAt: NOW - 86_400_000,
       updatedAt: NOW - 86_400_000,

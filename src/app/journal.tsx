@@ -9,7 +9,7 @@ import { GlassCard } from '@/components/ui/glass-card';
 import { PressableScale } from '@/components/ui/pressable-scale';
 import { buildJournalFeed } from '@/domain/journal-feed';
 import type { FastSession } from '@/schemas/fast-session';
-import type { JournalEntry } from '@/schemas/journal-entry';
+import { RESSENTI_TAGS, type JournalEntry, type RessentiTag } from '@/schemas/journal-entry';
 import { journalStore, useJournalStore } from '@/stores/journal-store';
 import { colors } from '@/theme/tokens';
 import { ScrollView, Text, TextInput, View } from '@/tw';
@@ -62,6 +62,61 @@ function MoodSelector({
           </PressableScale>
         );
       })}
+    </View>
+  );
+}
+
+/** Sélecteur de ressentis (multi-choix) — vocabulaire contrôlé. */
+function TagSelector({
+  selected,
+  onToggle,
+}: {
+  selected: readonly RessentiTag[];
+  onToggle: (tag: RessentiTag) => void;
+}) {
+  const { t } = useTranslation('journal');
+  return (
+    <View className="flex-row flex-wrap gap-2">
+      {RESSENTI_TAGS.map((tag) => {
+        const active = selected.includes(tag);
+        return (
+          <PressableScale
+            key={tag}
+            onPress={() => onToggle(tag)}
+            accessibilityLabel={t(`tag_${tag}`)}
+            accessibilityState={{ selected: active }}
+          >
+            <View
+              className="rounded-full border px-3 py-1.5"
+              style={{
+                borderColor: active ? colors.accent : colors.border,
+                backgroundColor: active ? colors.accent : 'transparent',
+              }}
+            >
+              <Text
+                className="font-sans-medium text-xs"
+                style={{ color: active ? colors.background : colors.contentMuted }}
+              >
+                {t(`tag_${tag}`)}
+              </Text>
+            </View>
+          </PressableScale>
+        );
+      })}
+    </View>
+  );
+}
+
+/** Ressentis d'une note enregistrée (lecture seule). */
+function TagChips({ tags }: { tags: readonly RessentiTag[] }) {
+  const { t } = useTranslation('journal');
+  return (
+    <View className="flex-row flex-wrap gap-2">
+      {tags.map((tag) => (
+        <View key={tag} className="rounded-full border border-accent-deep bg-surface px-3 py-1">
+          <Text className="font-sans-medium text-xs text-accent-bright">{t(`tag_${tag}`)}</Text>
+        </View>
+      ))}
     </View>
   );
 }
@@ -145,6 +200,7 @@ function EntryCard({ entry }: { entry: JournalEntry }) {
         <Text className="font-sans text-xs text-content-faint">{formatDate(entry.createdAt)}</Text>
       </View>
       {entry.mood !== null && <MoodDots value={entry.mood} />}
+      {entry.tags.length > 0 && <TagChips tags={entry.tags} />}
       {entry.note !== null && (
         <Text className="font-serif text-base leading-6 text-content-muted">{entry.note}</Text>
       )}
@@ -160,6 +216,7 @@ export default function JournalScreen() {
   const phasesBySession = useJournalStore((state) => state.phasesBySession);
 
   const [mood, setMood] = useState<number | null>(null);
+  const [tags, setTags] = useState<RessentiTag[]>([]);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   // « Maintenant » figé au montage : le fil (fenêtre 30 j) ne dépend pas des re-renders.
@@ -172,7 +229,12 @@ export default function JournalScreen() {
   const feed = useMemo(() => buildJournalFeed(sessions, entries, now), [sessions, entries, now]);
 
   const trimmedNote = note.trim();
-  const canSave = mood !== null || trimmedNote.length > 0;
+  const canSave = mood !== null || tags.length > 0 || trimmedNote.length > 0;
+
+  const toggleTag = (tag: RessentiTag) =>
+    setTags((current) =>
+      current.includes(tag) ? current.filter((t) => t !== tag) : [...current, tag],
+    );
 
   const onSave = async () => {
     if (!canSave || saving) {
@@ -182,8 +244,9 @@ export default function JournalScreen() {
     try {
       await journalStore
         .getState()
-        .addEntry({ mood, note: trimmedNote.length > 0 ? trimmedNote : null });
+        .addEntry({ mood, tags, note: trimmedNote.length > 0 ? trimmedNote : null });
       setMood(null);
+      setTags([]);
       setNote('');
     } finally {
       setSaving(false);
@@ -207,6 +270,8 @@ export default function JournalScreen() {
             </Text>
             <Text className="font-serif text-sm text-content-muted">{t('moodLabel')}</Text>
             <MoodSelector value={mood} onChange={setMood} />
+            <Text className="font-serif text-sm text-content-muted">{t('tagsLabel')}</Text>
+            <TagSelector selected={tags} onToggle={toggleTag} />
             <TextInput
               accessibilityLabel={t('notePlaceholder')}
               value={note}
