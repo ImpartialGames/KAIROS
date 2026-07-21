@@ -15,10 +15,12 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { runGuestMigrationOnSignIn } from '@/account/account-sync';
 import { BootstrapError } from '@/components/app/bootstrap-error';
 import { GlassTabBar } from '@/components/app/glass-tab-bar';
 import { initFastingNotifications } from '@/notifications/fasting-notifications';
 import { appStore, useAppStore } from '@/stores/app-store';
+import { authStore, useAuthStore } from '@/stores/auth-store';
 import { fastingStore } from '@/stores/fasting-store';
 import { kairosNavigationTheme } from '@/theme/navigation';
 import { colors } from '@/theme/tokens';
@@ -36,6 +38,8 @@ export default function RootLayout() {
   });
 
   const appStatus = useAppStore((state) => state.status);
+  const authStatus = useAuthStore((state) => state.status);
+  const authUserId = useAuthStore((state) => state.user?.id ?? null);
 
   useEffect(() => {
     // Premier lancement : ouvre la base et crée/recharge l'invité (mode invité, CLAUDE.md).
@@ -44,11 +48,31 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
+    // Écoute la session Supabase. Résilient si l'env n'est pas configuré :
+    // l'auth reste indisponible mais l'app démarre normalement.
+    let unsubscribe: (() => void) | undefined;
+    try {
+      unsubscribe = authStore.getState().init();
+    } catch {
+      // Supabase non configuré — mode invité uniquement.
+    }
+    return () => unsubscribe?.();
+  }, []);
+
+  useEffect(() => {
     // Session en cours rechargée après le bootstrap (paliers manqués rattrapés).
     if (appStatus === 'ready') {
       void fastingStore.getState().hydrate();
     }
   }, [appStatus]);
+
+  useEffect(() => {
+    // À la connexion : convertit l'invité en inscrit (en place + upload cloud).
+    // Idempotent → un échec réseau réessaie à la prochaine connexion.
+    if (appStatus === 'ready' && authStatus === 'signedIn' && authUserId) {
+      void runGuestMigrationOnSignIn(authUserId).catch(() => undefined);
+    }
+  }, [appStatus, authStatus, authUserId]);
 
   const fontsReady = fontsLoaded || fontError !== null;
   // Le splash se retire dès qu'on a quelque chose à montrer : l'app OU l'écran d'erreur.

@@ -24,6 +24,8 @@ export interface AppState {
   bootstrap(): Promise<void>;
   /** Enregistre l'acceptation de l'écran précautions pour l'utilisateur courant. */
   acknowledgePrecautions(): Promise<void>;
+  /** Remplace l'utilisateur courant (ex. après conversion invité → inscrit). */
+  setUser(user: User): void;
 }
 
 /** L'écran précautions doit être montré tant que l'utilisateur ne l'a pas accepté. */
@@ -66,6 +68,10 @@ export function createAppStore({ getDb, now = Date.now, repositoryDeps }: AppSto
       }
       const updated = await repositories.users.acknowledgePrecautions(user.id, now());
       set({ user: updated });
+    },
+
+    setUser(user) {
+      set({ user });
     },
   }));
 }

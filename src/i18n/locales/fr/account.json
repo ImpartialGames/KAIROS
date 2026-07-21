@@ -1,0 +1,21 @@
+{
+  "title": "Compte",
+  "intro": "Créez un compte pour sauvegarder vos données et les retrouver sur tous vos appareils. Vos jeûnes en cours restent intacts.",
+  "email": "Adresse email",
+  "password": "Mot de passe",
+  "signIn": "Se connecter",
+  "signUp": "Créer un compte",
+  "noAccount": "Pas encore de compte ? Créer un compte",
+  "haveAccount": "Déjà un compte ? Se connecter",
+  "forgotPassword": "Mot de passe oublié ?",
+  "resetTitle": "Réinitialiser le mot de passe",
+  "resetSend": "Envoyer le lien",
+  "resetSent": "Si un compte existe pour cette adresse, un lien de réinitialisation vient d'être envoyé.",
+  "backToSignIn": "Retour à la connexion",
+  "awaitingTitle": "Vérifiez vos emails",
+  "awaitingBody": "Un lien de confirmation a été envoyé à {{email}}. Cliquez dessus, puis revenez vous connecter.",
+  "signedInTitle": "Connecté",
+  "signedInBody": "Vos données sont sauvegardées et synchronisées sur ce compte.",
+  "signOut": "Se déconnecter",
+  "loading": "Chargement…"
+}
